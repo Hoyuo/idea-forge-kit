@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-11-30
+
+### Added
+
+- **3-Stage Upgrade Workflow**: 버전 체크 → 백업 → 템플릿 동기화
+- **자동 롤백 시스템**: 업그레이드 실패 시 자동 복원
+- **백업 관리**: `.forge-backups/` 디렉토리에 타임스탬프 백업
+- **template_version 추적**: config.json에서 템플릿 버전 관리
+
+### Changed
+
+- `forge upgrade` 명령어 개선
+  - `--force` 옵션: 버전 체크 무시하고 강제 업그레이드
+  - `--rollback` 옵션: 마지막 백업으로 롤백
+- 사용자 데이터 보존 강화 (.forge/prds, tasks, agents, progress, reports)
+
+### Technical
+
+- `core/upgrade` 모듈 추가
+  - `VersionChecker`: 시맨틱 버전 비교
+  - `BackupManager`: 백업/복원/정리
+  - `TemplateSync`: 템플릿 동기화
+
 ## [0.1.0] - 2025-11-30
 
 ### Added
@@ -27,5 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rich 터미널 UI
 - Jinja2 템플릿 엔진
 
-[Unreleased]: https://github.com/Hoyuo/idea-forge-kit/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Hoyuo/idea-forge-kit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/Hoyuo/idea-forge-kit/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Hoyuo/idea-forge-kit/releases/tag/v0.1.0

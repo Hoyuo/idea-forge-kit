@@ -1,6 +1,6 @@
 # 🔥 IdeaForge
 
-[![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/Hoyuo/idea-forge-kit)
+[![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)](https://github.com/Hoyuo/idea-forge-kit)
 [![Python](https://img.shields.io/badge/python-3.10+-green.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 

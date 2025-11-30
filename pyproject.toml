@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "ideaforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI-powered development kit: Idea to Implementation with auto-generated agents and TDD workflow"
 readme = "README.md"
 license = "MIT"
@@ -51,9 +51,9 @@ dev = [
 forge = "ideaforge.cli.main:cli"
 
 [project.urls]
-Homepage = "https://github.com/yourusername/idea-forge-kit"
-Repository = "https://github.com/yourusername/idea-forge-kit"
-Documentation = "https://github.com/yourusername/idea-forge-kit#readme"
+Homepage = "https://github.com/Hoyuo/idea-forge-kit"
+Repository = "https://github.com/Hoyuo/idea-forge-kit"
+Documentation = "https://github.com/Hoyuo/idea-forge-kit#readme"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/ideaforge"]

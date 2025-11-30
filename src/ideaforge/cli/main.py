@@ -131,14 +131,15 @@ def init(path: str, force: bool):
         task5 = progress.add_task("Creating config...", total=1)
         config_path = dst_forge / "config.json"
         if not config_path.exists():
-            config_content = """{
-  "version": "0.1.0",
+            config_content = f"""{{
+  "version": "{__version__}",
+  "template_version": "{__version__}",
   "project_name": "",
   "language": "ko",
   "auto_agent_generation": true,
   "tdd_enabled": true,
   "checkpoint_enabled": true
-}
+}}
 """
             config_path.write_text(config_content)
         progress.update(task5, completed=1)
@@ -346,116 +347,152 @@ def list_prds():
 
 
 @cli.command()
-def upgrade():
-    """Upgrade IdeaForge templates to the latest version.
+@click.option("--force", "-f", is_flag=True, help="강제 업그레이드 (버전 체크 무시)")
+@click.option("--rollback", is_flag=True, help="마지막 백업으로 롤백")
+def upgrade(force: bool, rollback: bool):
+    """IdeaForge 템플릿을 최신 버전으로 업그레이드.
 
-    Updates .claude/ directory (agents, commands, hooks, skills) while
-    preserving user data in .forge/ (PRDs, agents, progress, config).
+    3-Stage Workflow:
+      Stage 1: 버전 체크 - 업그레이드 필요 여부 확인
+      Stage 2: 백업 생성 - 롤백 지원
+      Stage 3: 템플릿 동기화 - .claude/, CLAUDE.md, .mcp.json 업데이트
 
-    Example:
-        forge upgrade
+    사용자 데이터 보존:
+      - .forge/prds/      PRD 문서
+      - .forge/tasks/     태스크 분해 결과
+      - .forge/agents/    동적 생성 에이전트
+      - .forge/progress/  진행 상황
+      - .forge/reports/   검증 리포트
+
+    Examples:
+        forge upgrade           # 일반 업그레이드
+        forge upgrade --force   # 강제 업그레이드
+        forge upgrade --rollback  # 마지막 백업으로 롤백
     """
+    from ideaforge.core.upgrade import VersionChecker, BackupManager, TemplateSync
+
     print_banner()
 
     cwd = Path.cwd()
     forge_dir = cwd / ".forge"
-    claude_dir = cwd / ".claude"
 
-    # Check if this is an IdeaForge project
+    # 프로젝트 확인
     if not forge_dir.exists():
-        console.print("[red]✗ Not an IdeaForge project[/red]")
-        console.print("  Run: [bold]forge init .[/bold] to initialize")
+        console.print("[red]✗ IdeaForge 프로젝트가 아닙니다[/red]")
+        console.print("  실행: [bold]forge init .[/bold]")
         return
 
-    # Get current version from config
-    config_path = forge_dir / "config.json"
-    current_version = "unknown"
-    if config_path.exists():
-        import json
-        try:
-            config = json.loads(config_path.read_text())
-            current_version = config.get("version", "unknown")
-        except json.JSONDecodeError:
-            pass
-
-    console.print(f"[bold]Upgrade IdeaForge[/bold]\n")
-    console.print(f"  Current version: [yellow]{current_version}[/yellow]")
-    console.print(f"  Target version:  [green]{__version__}[/green]\n")
-
-    if current_version == __version__:
-        console.print("[green]✓ Already up to date![/green]")
+    # 롤백 모드
+    if rollback:
+        _handle_rollback(cwd)
         return
 
-    # Backup .claude directory
-    from datetime import datetime
-    backup_name = f".claude.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    if claude_dir.exists():
-        backup_path = cwd / backup_name
-        console.print(f"[dim]Creating backup: {backup_name}[/dim]\n")
-        shutil.copytree(claude_dir, backup_path)
+    # Stage 1: 버전 체크
+    console.print("[bold cyan]Stage 1:[/bold cyan] 버전 체크\n")
 
-    # Perform upgrade
+    checker = VersionChecker(cwd)
+    version_info = checker.check()
+
+    console.print(f"  현재 버전: [yellow]{version_info.current}[/yellow]")
+    console.print(f"  패키지 버전: [green]{version_info.package}[/green]\n")
+
+    if not version_info.needs_upgrade and not force:
+        console.print("[green]✓ 이미 최신 버전입니다![/green]")
+        return
+
+    if not version_info.needs_upgrade and force:
+        console.print("[yellow]⚠ 최신 버전이지만 --force로 강제 업그레이드합니다[/yellow]\n")
+
+    # Stage 2: 백업
+    console.print("[bold cyan]Stage 2:[/bold cyan] 백업 생성\n")
+
+    backup_manager = BackupManager(cwd)
+    backup_result = backup_manager.create_backup()
+
+    if not backup_result.success:
+        console.print(f"[red]✗ 백업 실패: {backup_result.message}[/red]")
+        return
+
+    if backup_result.backup_path:
+        console.print(f"  [green]✓[/green] {backup_result.message}")
+        console.print(f"  [dim]위치: {backup_result.backup_path.relative_to(cwd)}[/dim]\n")
+    else:
+        console.print(f"  [dim]{backup_result.message}[/dim]\n")
+
+    # Stage 3: 템플릿 동기화
+    console.print("[bold cyan]Stage 3:[/bold cyan] 템플릿 동기화\n")
+
+    sync = TemplateSync(cwd)
+
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
+        task = progress.add_task("템플릿 동기화 중...", total=1)
+        sync_result = sync.sync()
+        progress.update(task, completed=1)
 
-        # Remove old .claude directory
-        task1 = progress.add_task("Removing old templates...", total=1)
-        if claude_dir.exists():
-            shutil.rmtree(claude_dir)
-        progress.update(task1, completed=1)
+    if not sync_result.success:
+        console.print(f"[red]✗ 동기화 실패: {sync_result.message}[/red]")
 
-        # Copy new .claude directory
-        task2 = progress.add_task("Installing new templates...", total=1)
-        src_claude = TEMPLATES_DIR / ".claude"
-        if src_claude.exists():
-            shutil.copytree(src_claude, claude_dir)
-        progress.update(task2, completed=1)
+        # 롤백 시도
+        if backup_result.backup_path:
+            console.print("[yellow]⚠ 백업에서 복원 중...[/yellow]")
+            restore_result = backup_manager.restore_backup(backup_result.backup_path)
+            if restore_result.success:
+                console.print("[green]✓ 복원 완료[/green]")
+            else:
+                console.print(f"[red]✗ 복원 실패: {restore_result.message}[/red]")
+        return
 
-        # Update .mcp.json
-        task3 = progress.add_task("Updating MCP config...", total=1)
-        src_mcp = TEMPLATES_DIR / ".mcp.json"
-        dst_mcp = cwd / ".mcp.json"
-        if src_mcp.exists():
-            shutil.copy2(src_mcp, dst_mcp)
-        progress.update(task3, completed=1)
+    # 버전 업데이트
+    checker.update_project_version()
 
-        # Update CLAUDE.md (backup old one)
-        task4 = progress.add_task("Updating CLAUDE.md...", total=1)
-        src_claude_md = TEMPLATES_DIR / "CLAUDE.md"
-        dst_claude_md = cwd / "CLAUDE.md"
-        if dst_claude_md.exists():
-            old_claude_md = cwd / "CLAUDE.md.old"
-            shutil.copy2(dst_claude_md, old_claude_md)
-        if src_claude_md.exists():
-            shutil.copy2(src_claude_md, dst_claude_md)
-        progress.update(task4, completed=1)
+    # 오래된 백업 정리
+    deleted = backup_manager.cleanup_old_backups(keep_count=5)
+    if deleted > 0:
+        console.print(f"  [dim]오래된 백업 {deleted}개 정리됨[/dim]")
 
-        # Update version in config
-        task5 = progress.add_task("Updating config version...", total=1)
-        if config_path.exists():
-            import json
-            try:
-                config = json.loads(config_path.read_text())
-                config["version"] = __version__
-                config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False))
-            except json.JSONDecodeError:
-                pass
-        progress.update(task5, completed=1)
+    # 성공 메시지
+    console.print(f"\n[bold green]✓ v{version_info.package}으로 업그레이드 완료![/bold green]\n")
 
-    # Success message
-    console.print(f"\n[bold green]✓ Upgraded to v{__version__}![/bold green]\n")
-    console.print(f"[dim]Backup: {backup_name}[/dim]")
+    console.print(f"  [dim]업데이트된 파일: {sync_result.files_updated}개[/dim]")
+    if backup_result.backup_path:
+        console.print(f"  [dim]백업 위치: {backup_result.backup_path.relative_to(cwd)}[/dim]")
 
-    if (cwd / "CLAUDE.md.old").exists():
-        console.print("[dim]Previous CLAUDE.md saved as CLAUDE.md.old[/dim]")
+    console.print("\n[bold]보존된 사용자 데이터:[/bold]")
+    console.print("  • .forge/prds/      PRD 문서")
+    console.print("  • .forge/tasks/     태스크 분해")
+    console.print("  • .forge/agents/    동적 에이전트")
+    console.print("  • .forge/progress/  진행 상황")
 
-    console.print("\n[bold]Next steps:[/bold]")
-    console.print("  1. Review changes in .claude/")
-    console.print("  2. Check CLAUDE.md.old for any custom content to merge")
-    console.print("  3. Run: claude")
+    console.print("\n[bold]다음 단계:[/bold]")
+    console.print("  1. claude 실행")
+    console.print("  2. /forge:status로 상태 확인")
+
+
+def _handle_rollback(project_path: Path):
+    """백업에서 롤백 처리."""
+    from ideaforge.core.upgrade import BackupManager
+
+    backup_manager = BackupManager(project_path)
+    backups = backup_manager.list_backups()
+
+    if not backups:
+        console.print("[yellow]⚠ 사용 가능한 백업이 없습니다[/yellow]")
+        return
+
+    # 최신 백업으로 롤백
+    latest_backup = backups[0]
+    console.print(f"[bold]롤백 대상:[/bold] {latest_backup.name}\n")
+
+    restore_result = backup_manager.restore_backup(latest_backup)
+
+    if restore_result.success:
+        console.print("[bold green]✓ 롤백 완료![/bold green]")
+    else:
+        console.print(f"[red]✗ 롤백 실패: {restore_result.message}[/red]")
 
 
 if __name__ == "__main__":

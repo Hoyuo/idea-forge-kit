@@ -242,4 +242,4 @@ Supported languages: en, ko, ja, zh
 
 ## Version
 
-IdeaForge v0.1.0
+IdeaForge v0.2.0
