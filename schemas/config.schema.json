@@ -1,0 +1,428 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/Hoyuo/idea-forge-kit/main/schemas/config.schema.json",
+  "title": "IdeaForge Config",
+  "description": "IdeaForge 프로젝트 설정 파일",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema URL"
+    },
+    "version": {
+      "type": "string",
+      "description": "IdeaForge 버전",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "examples": ["0.2.0"]
+    },
+    "template_version": {
+      "type": "string",
+      "description": "설치된 템플릿 버전 (업그레이드 시 자동 관리)",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "project": {
+      "type": "object",
+      "description": "프로젝트 기본 정보",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "프로젝트 이름"
+        },
+        "description": {
+          "type": "string",
+          "description": "프로젝트 설명"
+        },
+        "created_at": {
+          "type": "string",
+          "description": "생성 일시 (ISO 8601)",
+          "format": "date-time"
+        },
+        "language": {
+          "type": "string",
+          "description": "주 프로그래밍 언어",
+          "examples": ["python", "typescript", "go", "rust"]
+        },
+        "framework": {
+          "type": "string",
+          "description": "사용 프레임워크",
+          "examples": ["fastapi", "nextjs", "django", "express"]
+        }
+      }
+    },
+    "language": {
+      "type": "object",
+      "description": "언어 설정",
+      "properties": {
+        "conversation": {
+          "type": "string",
+          "description": "AI 응답 언어",
+          "enum": ["en", "ko", "ja", "zh"],
+          "default": "ko"
+        },
+        "output_documents": {
+          "type": "string",
+          "description": "PRD/리포트 출력 언어",
+          "enum": ["en", "ko", "ja", "zh"],
+          "default": "ko"
+        },
+        "supported": {
+          "type": "array",
+          "description": "지원 언어 목록",
+          "items": {
+            "type": "string",
+            "enum": ["en", "ko", "ja", "zh"]
+          }
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "description": "워크플로우 설정",
+      "properties": {
+        "auto_agent_generation": {
+          "type": "boolean",
+          "description": "PRD 분석 시 에이전트 자동 생성",
+          "default": true
+        },
+        "tdd_enabled": {
+          "type": "boolean",
+          "description": "TDD 워크플로우 활성화",
+          "default": true
+        },
+        "checkpoint_enabled": {
+          "type": "boolean",
+          "description": "체크포인트 시스템 활성화 (작업 중단/재개)",
+          "default": true
+        },
+        "test_coverage_target": {
+          "type": "integer",
+          "description": "목표 테스트 커버리지 (%)",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 80
+        }
+      }
+    },
+    "user": {
+      "type": "object",
+      "description": "사용자 정보",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "사용자 이름 (개인화된 인사말에 사용)"
+        }
+      }
+    },
+    "git_strategy": {
+      "type": "object",
+      "description": "Git 전략 설정",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "description": "Git 모드",
+          "enum": ["manual", "personal", "team"],
+          "default": "manual"
+        },
+        "manual": {
+          "type": "object",
+          "description": "Manual 모드 설정 (로컬 전용)",
+          "properties": {
+            "environment": {
+              "type": "string",
+              "enum": ["local"]
+            },
+            "auto_branch": {
+              "type": "boolean",
+              "default": false
+            },
+            "auto_commit": {
+              "type": "boolean",
+              "default": true
+            },
+            "auto_pr": {
+              "type": "boolean",
+              "default": false
+            },
+            "auto_push": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "personal": {
+          "type": "object",
+          "description": "Personal 모드 설정 (GitHub 개인)",
+          "properties": {
+            "environment": {
+              "type": "string",
+              "enum": ["github"]
+            },
+            "auto_branch": {
+              "type": "boolean",
+              "default": true
+            },
+            "auto_commit": {
+              "type": "boolean",
+              "default": true
+            },
+            "auto_pr": {
+              "type": "boolean",
+              "default": false
+            },
+            "auto_push": {
+              "type": "boolean",
+              "default": true
+            },
+            "branch_prefix": {
+              "type": "string",
+              "default": "feature/"
+            },
+            "main_branch": {
+              "type": "string",
+              "default": "main"
+            }
+          }
+        },
+        "team": {
+          "type": "object",
+          "description": "Team 모드 설정 (GitHub 팀)",
+          "properties": {
+            "environment": {
+              "type": "string",
+              "enum": ["github"]
+            },
+            "auto_branch": {
+              "type": "boolean",
+              "default": true
+            },
+            "auto_commit": {
+              "type": "boolean",
+              "default": true
+            },
+            "auto_pr": {
+              "type": "boolean",
+              "default": true
+            },
+            "auto_push": {
+              "type": "boolean",
+              "default": true
+            },
+            "draft_pr": {
+              "type": "boolean",
+              "description": "Draft PR로 생성",
+              "default": true
+            },
+            "required_reviews": {
+              "type": "integer",
+              "description": "필요한 리뷰어 수",
+              "minimum": 0,
+              "default": 1
+            },
+            "branch_protection": {
+              "type": "boolean",
+              "default": true
+            },
+            "branch_prefix": {
+              "type": "string",
+              "default": "feature/"
+            },
+            "main_branch": {
+              "type": "string",
+              "default": "main"
+            }
+          }
+        },
+        "commit_style": {
+          "type": "object",
+          "description": "커밋 스타일 설정",
+          "properties": {
+            "format": {
+              "type": "string",
+              "description": "커밋 메시지 포맷",
+              "enum": ["conventional", "gitmoji", "simple"],
+              "default": "conventional"
+            },
+            "types": {
+              "type": "array",
+              "description": "허용되는 커밋 타입",
+              "items": {
+                "type": "string"
+              },
+              "default": ["feat", "fix", "docs", "style", "refactor", "test", "chore"]
+            },
+            "scope_required": {
+              "type": "boolean",
+              "description": "스코프 필수 여부",
+              "default": false
+            }
+          }
+        },
+        "hooks": {
+          "type": "object",
+          "description": "Git 훅 설정",
+          "properties": {
+            "pre_commit": {
+              "type": "string",
+              "enum": ["off", "warn", "error"],
+              "default": "warn"
+            },
+            "pre_push": {
+              "type": "string",
+              "enum": ["off", "warn", "error"],
+              "default": "warn"
+            }
+          }
+        }
+      }
+    },
+    "document_management": {
+      "type": "object",
+      "description": "문서 관리 설정",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "auto_sync": {
+          "type": "boolean",
+          "description": "/forge:build 후 자동으로 /forge:sync 실행",
+          "default": false
+        },
+        "directories": {
+          "type": "object",
+          "description": "디렉토리 경로 설정",
+          "properties": {
+            "prds": { "type": "string", "default": ".forge/prds/" },
+            "tasks": { "type": "string", "default": ".forge/tasks/" },
+            "progress": { "type": "string", "default": ".forge/progress/" },
+            "design": { "type": "string", "default": ".forge/design/" },
+            "reports": { "type": "string", "default": ".forge/reports/" },
+            "agents": { "type": "string", "default": ".forge/agents/" },
+            "logs": { "type": "string", "default": ".forge/logs/" }
+          }
+        },
+        "sections": {
+          "type": "object",
+          "description": "문서 섹션 설정",
+          "properties": {
+            "readme": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "auto_update": { "type": "boolean", "default": true }
+              }
+            },
+            "api": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "format": { "type": "string", "enum": ["markdown", "openapi"], "default": "markdown" }
+              }
+            },
+            "diagrams": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "format": { "type": "string", "enum": ["plantuml", "mermaid"], "default": "plantuml" }
+              }
+            },
+            "tests": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "include_coverage": { "type": "boolean", "default": true }
+              }
+            },
+            "changelog": {
+              "type": "object",
+              "properties": {
+                "enabled": { "type": "boolean", "default": true },
+                "format": { "type": "string", "enum": ["keepachangelog", "conventional"], "default": "keepachangelog" }
+              }
+            }
+          }
+        },
+        "cleanup": {
+          "type": "object",
+          "description": "자동 정리 설정",
+          "properties": {
+            "enabled": { "type": "boolean", "default": true },
+            "retention_days": {
+              "type": "integer",
+              "description": "로그/임시 파일 보관 일수",
+              "minimum": 1,
+              "default": 30
+            },
+            "targets": {
+              "type": "array",
+              "description": "정리 대상 glob 패턴",
+              "items": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "dashboard": {
+      "type": "object",
+      "description": "대시보드 설정",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "port": {
+          "type": "integer",
+          "description": "대시보드 포트",
+          "minimum": 1024,
+          "maximum": 65535,
+          "default": 20555
+        },
+        "auto_open": {
+          "type": "boolean",
+          "description": "대시보드 자동 열기",
+          "default": false
+        }
+      }
+    },
+    "quality": {
+      "type": "object",
+      "description": "코드 품질 설정",
+      "properties": {
+        "test_coverage_target": {
+          "type": "integer",
+          "description": "목표 테스트 커버리지 (%)",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 80
+        },
+        "lint_on_save": {
+          "type": "boolean",
+          "description": "저장 시 린트 실행",
+          "default": true
+        },
+        "format_on_save": {
+          "type": "boolean",
+          "description": "저장 시 포맷팅 실행",
+          "default": true
+        }
+      }
+    },
+    "mcp": {
+      "type": "object",
+      "description": "MCP 서버 설정",
+      "properties": {
+        "context7": {
+          "type": "boolean",
+          "description": "Context7 MCP 서버 활성화",
+          "default": true
+        },
+        "sequential_thinking": {
+          "type": "boolean",
+          "description": "Sequential-Thinking MCP 서버 활성화",
+          "default": true
+        }
+      }
+    }
+  },
+  "required": ["version"]
+}
