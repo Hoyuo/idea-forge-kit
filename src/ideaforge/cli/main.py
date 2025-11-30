@@ -22,7 +22,7 @@ TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
 def print_banner():
     """Print welcome banner."""
     console.print(Panel.fit(
-        f"[bold white]Idea → PRD → Agents → TDD → Done[/bold white]",
+        f"[bold white]Idea → Implement → Test → Done[/bold white]",
         title=f"[bold cyan]🔥 IdeaForge v{__version__}[/bold cyan]",
         border_style="cyan",
     ))
