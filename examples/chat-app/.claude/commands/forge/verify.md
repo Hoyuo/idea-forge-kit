@@ -1,100 +1,112 @@
-# /forge:verify - 요구사항 검증
+# /forge:verify - Requirements Verification
 
-## 사용법
+## Usage
 
 ```
 /forge:verify AUTH-001
 ```
 
-## 입력
+## Input
 
-`$ARGUMENTS` - 검증할 PRD ID
+`$ARGUMENTS` - PRD ID to verify
 
-## 워크플로우
+## Language Configuration
 
-### 1. 검증 준비
+Read from `.forge/config.json`:
+- Use `language.conversation` for verification responses
+- Use `language.output_documents` for verification reports
+
+## Workflow
+
+### 1. Verification Preparation
 
 ```
-✔️ IdeaForge Verify: {PRD_ID}
+IdeaForge Verify: {PRD_ID}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-1. PRD 로드: `.forge/prds/{PRD_ID}.md`
-2. 태스크 현황: `.forge/tasks/{PRD_ID}/tasks.json`
-3. 진행 상황: `.forge/progress/{PRD_ID}/checkpoint.json`
+1. Load PRD: `.forge/prds/{PRD_ID}.md`
+2. Task status: `.forge/tasks/{PRD_ID}/tasks.json`
+3. Progress: `.forge/progress/{PRD_ID}/checkpoint.json`
 
-### 2. 요구사항 체크리스트 검증
+### 2. Requirements Checklist Verification
 
-PRD의 각 요구사항에 대해:
+For each requirement in PRD:
 
 ```
-📋 기능 요구사항 검증
+Functional Requirements Verification
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ FR-001: 이메일/비밀번호 로그인
-   ├── 구현: src/auth/login.py ✓
-   ├── 테스트: tests/test_auth.py::test_login ✓
-   └── 커버리지: 92% ✓
+✓ FR-001: Email/Password Login
+   ├── Implementation: src/auth/login.py ✓
+   ├── Tests: tests/test_auth.py::test_login ✓
+   └── Coverage: 92% ✓
 
-✅ FR-002: OAuth 소셜 로그인
-   ├── 구현: src/auth/oauth.py ✓
-   ├── 테스트: tests/test_oauth.py ✓
-   └── 커버리지: 88% ✓
+✓ FR-002: OAuth Social Login
+   ├── Implementation: src/auth/oauth.py ✓
+   ├── Tests: tests/test_oauth.py ✓
+   └── Coverage: 88% ✓
 
-⚠️ FR-003: 비밀번호 재설정
-   ├── 구현: src/auth/password.py ✓
-   ├── 테스트: tests/test_password.py ✓
-   └── 커버리지: 65% ⚠️ (목표: 80%)
+⚠ FR-003: Password Reset
+   ├── Implementation: src/auth/password.py ✓
+   ├── Tests: tests/test_password.py ✓
+   └── Coverage: 65% ⚠ (target: 80%)
 
-📋 비기능 요구사항 검증
+Non-Functional Requirements Verification
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ NFR-001: 응답시간 < 200ms
-   └── 측정값: 평균 145ms ✓
+✓ NFR-001: Response Time < 200ms
+   └── Measured: avg 145ms ✓
 
-✅ NFR-002: 보안 표준 준수
-   └── OWASP Top 10 체크 ✓
+✓ NFR-002: Security Standards Compliance
+   └── OWASP Top 10 Check ✓
 ```
 
-### 3. 테스트 실행
+### 3. Test Execution
 
-전체 테스트 스위트 실행:
+Run full test suite (command determined by project's tech stack):
 
-```bash
-pytest tests/ -v --cov=src --cov-report=html
+```
+# Test command is auto-detected from project configuration
+# Examples by language:
+#   Python:     pytest tests/ -v --cov
+#   TypeScript: npm test -- --coverage
+#   Go:         go test ./... -cover
+#   Rust:       cargo test
+#   Java:       mvn test / gradle test
 ```
 
-결과:
+Result:
 ```
-📊 테스트 결과
+Test Results
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Total Tests: 24
-├── Passed:  24 ✅
+├── Passed:  24 ✓
 ├── Failed:  0
 ├── Skipped: 0
 └── Errors:  0
 
 Coverage: 87%
-├── src/auth/login.py     92%
-├── src/auth/oauth.py     88%
-├── src/auth/password.py  65% ⚠️
-└── src/auth/session.py   95%
+├── src/auth/login.*      92%
+├── src/auth/oauth.*      88%
+├── src/auth/password.*   65% ⚠
+└── src/auth/session.*    95%
 ```
 
-### 4. 코드 품질 검사
+### 4. Code Quality Check
 
 ```
-🔍 코드 품질
+Code Quality
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Linting (ruff):
-├── Errors: 0 ✅
-├── Warnings: 2 ⚠️
+Linting:
+├── Errors: 0 ✓
+├── Warnings: 2 ⚠
 └── Style: 98/100
 
-Type Checking (mypy):
-├── Errors: 0 ✅
+Type Checking:
+├── Errors: 0 ✓
 └── Coverage: 85%
 
 Complexity:
@@ -102,75 +114,75 @@ Complexity:
 └── Max Cyclomatic: 8 (acceptable)
 ```
 
-### 5. 최종 리포트 생성
+### 5. Final Report Generation
 
 `.forge/reports/{PRD_ID}-final.md`:
 
 ```markdown
-# {PRD_ID} 검증 리포트
+# {PRD_ID} Verification Report
 
-## 요약
-- 상태: ✅ 통과 / ⚠️ 부분 통과 / ❌ 실패
-- 검증일: {ISO-DATE}
-- 소요시간: {BUILD_DURATION}
+## Summary
+- Status: ✓ Pass / ⚠ Partial Pass / ✗ Fail
+- Verified: {ISO-DATE}
+- Duration: {BUILD_DURATION}
 
-## 요구사항 충족률
-- 기능 요구사항: 5/5 (100%)
-- 비기능 요구사항: 2/2 (100%)
+## Requirements Fulfillment
+- Functional Requirements: 5/5 (100%)
+- Non-Functional Requirements: 2/2 (100%)
 
-## 테스트 결과
-- 전체: 24 tests
-- 통과: 24 (100%)
-- 커버리지: 87%
+## Test Results
+- Total: 24 tests
+- Passed: 24 (100%)
+- Coverage: 87%
 
-## 코드 품질
+## Code Quality
 - Linting: Pass
 - Type Check: Pass
 - Complexity: Good
 
-## 개선 권장사항
-1. password.py 커버리지 향상 필요 (65% → 80%)
-2. 경고 2건 해결 권장
+## Improvement Recommendations
+1. Improve password.py coverage (65% → 80%)
+2. Resolve 2 warnings
 
-## 생성된 파일
-{파일 목록}
+## Generated Files
+{File list}
 ```
 
-### 6. 완료 메시지
+### 6. Completion Message
 
-**성공 시**:
+**On Success**:
 ```
-✅ 검증 완료: {PRD_ID}
+Verification Complete: {PRD_ID}
 
-📊 결과: PASSED
+Result: PASSED
 
-요구사항: 7/7 충족 (100%)
-테스트: 24/24 통과
-커버리지: 87%
+Requirements: 7/7 fulfilled (100%)
+Tests: 24/24 passed
+Coverage: 87%
 
-📄 리포트: .forge/reports/{PRD_ID}-final.md
+Report: .forge/reports/{PRD_ID}-final.md
 
-👉 다음 단계:
-   - Git commit 권장
-   - /forge:list 로 다른 PRD 확인
+Next Steps:
+   - Git commit recommended
+   - Check other PRDs with /forge:list
 ```
 
-**부분 통과 시**:
+**On Partial Pass**:
 ```
-⚠️ 검증 완료: {PRD_ID}
+Verification Complete: {PRD_ID}
 
-📊 결과: PARTIAL PASS
+Result: PARTIAL PASS
 
-요구사항: 6/7 충족 (86%)
-테스트: 22/24 통과
-커버리지: 72% (목표: 80%)
+Requirements: 6/7 fulfilled (86%)
+Tests: 22/24 passed
+Coverage: 72% (target: 80%)
 
-❌ 미충족 항목:
-   - FR-003: 커버리지 부족
-   - NFR-002: 성능 미달
+Unfulfilled Items:
+   - FR-003: Coverage insufficient
+   - NFR-002: Performance not met
 
-📄 리포트: .forge/reports/{PRD_ID}-final.md
+Report: .forge/reports/{PRD_ID}-final.md
 
-🔧 권장 조치:
+Recommended Actions:
    /forge:build {PRD_ID} --task FR-003
 ```

@@ -1,10 +1,118 @@
 {
-  "version": "0.1.0",
-  "project_name": "",
-  "language": "ko",
-  "auto_agent_generation": true,
-  "tdd_enabled": true,
-  "checkpoint_enabled": true,
-  "test_coverage_target": 80,
-  "created_at": ""
+  "version": "0.2.0",
+  "project": {
+    "name": "",
+    "description": "",
+    "created_at": "",
+    "language": "",
+    "framework": ""
+  },
+  "language": {
+    "conversation": "ko",
+    "output_documents": "ko",
+    "supported": ["en", "ko", "ja", "zh"],
+    "_notes": "conversation: AI response language, output_documents: PRD/report language"
+  },
+  "workflow": {
+    "auto_agent_generation": true,
+    "tdd_enabled": true,
+    "checkpoint_enabled": true,
+    "test_coverage_target": 80
+  },
+  "user": {
+    "name": "",
+    "_notes": "Optional: Used for personalized greetings"
+  },
+  "git_strategy": {
+    "mode": "manual",
+    "_notes": "3-Mode System: manual (local only), personal (GitHub individual), team (GitHub team)",
+
+    "manual": {
+      "environment": "local",
+      "auto_branch": false,
+      "auto_commit": true,
+      "auto_pr": false,
+      "auto_push": false,
+      "_notes": "Local Git only. TDD commits are automatic, branch/push are manual."
+    },
+    "personal": {
+      "environment": "github",
+      "auto_branch": true,
+      "auto_commit": true,
+      "auto_pr": false,
+      "auto_push": true,
+      "branch_prefix": "feature/",
+      "main_branch": "main",
+      "_notes": "GitHub individual project. Full automation except PR."
+    },
+    "team": {
+      "environment": "github",
+      "auto_branch": true,
+      "auto_commit": true,
+      "auto_pr": true,
+      "auto_push": true,
+      "draft_pr": true,
+      "required_reviews": 1,
+      "branch_protection": true,
+      "branch_prefix": "feature/",
+      "main_branch": "main",
+      "_notes": "GitHub team project. Full automation with governance."
+    },
+
+    "commit_style": {
+      "format": "conventional",
+      "types": ["feat", "fix", "docs", "style", "refactor", "test", "chore"],
+      "scope_required": false
+    },
+    "hooks": {
+      "pre_commit": "warn",
+      "pre_push": "warn"
+    }
+  },
+  "document_management": {
+    "enabled": true,
+    "auto_sync": false,
+    "_notes": "auto_sync: Automatically run /forge:sync after /forge:build",
+
+    "directories": {
+      "prds": ".forge/prds/",
+      "tasks": ".forge/tasks/",
+      "progress": ".forge/progress/",
+      "design": ".forge/design/",
+      "reports": ".forge/reports/",
+      "agents": ".forge/agents/",
+      "logs": ".forge/logs/"
+    },
+
+    "sections": {
+      "readme": { "enabled": true, "auto_update": true },
+      "api": { "enabled": true, "format": "markdown" },
+      "diagrams": { "enabled": true, "format": "plantuml" },
+      "tests": { "enabled": true, "include_coverage": true },
+      "changelog": { "enabled": true, "format": "keepachangelog" }
+    },
+
+    "cleanup": {
+      "enabled": true,
+      "retention_days": 30,
+      "targets": [".forge/logs/*", ".forge/reports/*.tmp"]
+    }
+  },
+  "dashboard": {
+    "enabled": true,
+    "port": 20555,
+    "auto_open": false,
+    "_notes": "Real-time progress visualization server"
+  },
+  "quality": {
+    "test_coverage_target": 80,
+    "lint_on_save": true,
+    "format_on_save": true,
+    "_notes": "Code quality settings"
+  },
+  "mcp": {
+    "context7": true,
+    "sequential_thinking": true,
+    "_notes": "MCP server integrations"
+  }
 }

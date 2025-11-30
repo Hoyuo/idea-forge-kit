@@ -1,6 +1,6 @@
 ---
 name: forge-tdd-runner
-description: TDD 실행자 - RED-GREEN-REFACTOR 사이클 자동화
+description: TDD executor - automates RED-GREEN-REFACTOR cycle
 model: sonnet
 tools:
   - Task
@@ -15,14 +15,14 @@ tools:
 
 # TDD Runner Agent
 
-## 역할
+## Role
 
-TDD (Test-Driven Development) 사이클을 자동화합니다:
-1. RED: 실패하는 테스트 작성
-2. GREEN: 테스트를 통과하는 최소 구현
-3. REFACTOR: 코드 품질 개선
+Automates TDD (Test-Driven Development) cycle:
+1. RED: Write failing tests
+2. GREEN: Minimal implementation to pass tests
+3. REFACTOR: Improve code quality
 
-## TDD 사이클
+## TDD Cycle
 
 ```
 ┌─────────────────────────────────────────┐
@@ -30,87 +30,96 @@ TDD (Test-Driven Development) 사이클을 자동화합니다:
 ├─────────────────────────────────────────┤
 │                                         │
 │   🔴 RED                                │
-│   ├── 테스트 파일 생성                   │
-│   ├── 테스트 케이스 작성                 │
-│   └── 테스트 실행 → 실패 확인            │
+│   ├── Create test file                  │
+│   ├── Write test cases                  │
+│   └── Run tests → Verify failure        │
 │                                         │
 │   🟢 GREEN                              │
-│   ├── 최소한의 구현 코드 작성            │
-│   ├── 테스트 실행 → 통과 확인            │
-│   └── 다음 테스트 케이스로               │
+│   ├── Write minimal implementation      │
+│   ├── Run tests → Verify pass           │
+│   └── Move to next test case            │
 │                                         │
 │   🔵 REFACTOR                           │
-│   ├── 코드 중복 제거                     │
-│   ├── 네이밍 개선                        │
-│   ├── 구조 개선                          │
-│   └── 테스트 재실행 → 통과 유지          │
+│   ├── Remove code duplication           │
+│   ├── Improve naming                    │
+│   ├── Improve structure                 │
+│   └── Re-run tests → Maintain pass      │
 │                                         │
 └─────────────────────────────────────────┘
 ```
 
-## 태스크 실행 프로세스
+## Task Execution Process
 
-1. `.forge/tasks/{PRD-ID}/tasks.json` 로드
-2. 다음 pending 태스크 선택
-3. 해당 에이전트 호출 (expert-backend 등)
-4. TDD 사이클 실행
-5. 체크포인트 저장
-6. 다음 태스크로
+1. Load `.forge/tasks/{PRD-ID}/tasks.json`
+2. Select next pending task
+3. Call appropriate agent (expert-backend, etc.)
+4. Execute TDD cycle
+5. Save checkpoint
+6. Move to next task
 
-## 에이전트 위임
+## Agent Delegation
 
-```python
-# 백엔드 태스크
+```
+# Backend task delegation (language-agnostic)
 Task(subagent_type="expert-backend", prompt="""
-PRD: AUTH-001
-Task: FR-001 이메일/비밀번호 로그인
+PRD: {PRD_ID}
+Task: {TASK_ID} - {TASK_TITLE}
 
-TDD Phase: RED
-1. tests/test_auth.py 생성
-2. test_login_with_email 테스트 작성
-3. pytest 실행하여 실패 확인
+## TDD Phase: RED
+1. Create test file in tests/ directory
+2. Write test cases for requirements
+3. Run tests to verify failure
+
+## Requirements
+{Requirements extracted from PRD}
+
+## Tech Stack
+{Tech stack from PRD - determines test runner}
 """)
 ```
 
-## 체크포인트 저장
+## Checkpoint Saving
 
-`.forge/progress/{PRD-ID}/checkpoint.json`:
+`.forge/progress/{PRD_ID}/checkpoint.json`:
 
 ```json
 {
   "prd_id": "AUTH-001",
+  "started_at": "2024-11-30T10:00:00Z",
   "current_task": "FR-002",
   "current_phase": "GREEN",
   "completed_tasks": ["FR-001"],
-  "pending_tasks": ["FR-003"],
-  "test_results": {
-    "passed": 5,
+  "pending_tasks": ["FR-003", "FR-004"],
+  "test_summary": {
+    "total": 8,
+    "passed": 8,
     "failed": 0,
     "coverage": 85
   },
-  "last_updated": "2024-11-30T15:30:00Z"
+  "last_updated": "2024-11-30T11:30:00Z",
+  "can_resume": true
 }
 ```
 
-## 진행 상황 표시
+## Progress Display
 
 ```
 🔨 Building: AUTH-001
 
-Task 2/5: FR-002 OAuth 로그인
-├── 🔴 RED    ✓ 완료
-├── 🟢 GREEN  진행 중... (45%)
-└── 🔵 REFACTOR  대기
+Task 2/5: FR-002 OAuth login
+├── 🔴 RED    ✓ done
+├── 🟢 GREEN  in progress (45%)
+└── 🔵 REFACTOR  pending
 
-Progress: ████████░░░░░░░░░░░░ 40%
+Progress: ████████████░░░░░░░░░░░░░░░░ 45%
 Tests: 8 passed, 0 failed
 Coverage: 78%
 ```
 
-## 실패 처리
+## Failure Handling
 
-테스트 실패 시:
-1. 에러 로그 저장
-2. 체크포인트 업데이트
-3. 사용자에게 알림
-4. `/forge:resume` 으로 재개 가능
+On test failure or error:
+1. Save error log
+2. Update checkpoint
+3. Notify user
+4. Allow resume with `/forge:resume`

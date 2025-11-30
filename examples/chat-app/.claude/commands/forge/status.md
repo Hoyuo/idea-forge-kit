@@ -1,85 +1,90 @@
-# /forge:status - 프로젝트 상태 확인
+# /forge:status - Check Project Status
 
-## 사용법
+## Usage
 
 ```
 /forge:status
 /forge:status AUTH-001
 ```
 
-## 입력
+## Input
 
-`$ARGUMENTS` - (선택) 특정 PRD ID. 없으면 전체 프로젝트 상태
+`$ARGUMENTS` - (Optional) Specific PRD ID. If omitted, shows overall project status
 
-## 워크플로우
+## Language Configuration
 
-### 1. 전체 프로젝트 상태 (PRD ID 없을 때)
+Read from `.forge/config.json`:
+- Use `language.conversation` for status display language
+
+## Workflow
+
+### 1. Overall Project Status (No PRD ID)
 
 ```
-🔥 IdeaForge Status
+IdeaForge Status
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📁 Project: {PROJECT_NAME}
-📍 Location: {CWD}
+Project: {PROJECT_NAME}
+Location: {CWD}
 
 ┌─ PRD Overview ────────────────────────────────┐
 │                                               │
 │  ID        Title              Status    Prog  │
 │  ────────  ─────────────────  ────────  ────  │
-│  AUTH-001  사용자 인증 시스템   🔨 build  45%   │
-│  CHAT-002  실시간 채팅         📝 draft   0%   │
-│  API-003   REST API 설계      ✅ done   100%  │
+│  AUTH-001  User Auth System   🔨 build  45%   │
+│  CHAT-002  Real-time Chat     📝 draft   0%   │
+│  API-003   REST API Design    ✓ done   100%   │
 │                                               │
 └───────────────────────────────────────────────┘
 
-📊 Summary:
+Summary:
    Total PRDs: 3
    ├── Draft: 1
    ├── Analyzed: 0
    ├── Building: 1
    └── Done: 1
 
-👉 Quick Actions:
-   /forge:idea "새 아이디어"     - 새 PRD 생성
-   /forge:build AUTH-001        - 빌드 계속
-   /forge:status AUTH-001       - 상세 상태
+Quick Actions:
+   /forge:idea "new idea"      - Create new PRD
+   /forge:build AUTH-001       - Continue build
+   /forge:status AUTH-001      - Detailed status
 ```
 
-### 2. 특정 PRD 상태 (PRD ID 있을 때)
+### 2. Specific PRD Status (With PRD ID)
 
 ```
-🔥 IdeaForge Status: AUTH-001
+IdeaForge Status: AUTH-001
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 PRD: 사용자 인증 시스템
-📊 Status: Building (45%)
-📅 Created: 2024-11-30
-⏱️  Active: 2h 15m
+PRD: User Authentication System
+Status: Building (45%)
+Created: 2024-11-30
+Active: 2h 15m
 
 ┌─ Phase Progress ──────────────────────────────┐
 │                                               │
-│  [✅] Idea    → PRD 생성 완료                  │
-│  [✅] Analyze → 에이전트 3개 생성               │
-│  [🔄] Build   → 2/5 태스크 완료                │
-│  [ ] Verify  → 대기 중                        │
+│  [✓] Idea    → PRD created                    │
+│  [✓] Analyze → 3 agents generated             │
+│  [~] Build   → 2/5 tasks completed            │
+│  [ ] Verify  → Pending                        │
 │                                               │
 └───────────────────────────────────────────────┘
 
 ┌─ Task Breakdown ──────────────────────────────┐
 │                                               │
-│  ✅ FR-001  이메일 로그인      [backend]  Done │
-│  ✅ FR-002  OAuth 연동        [backend]  Done │
-│  🔄 FR-003  비밀번호 재설정    [backend]  50%  │
-│  ⏳ FR-004  세션 관리          [backend]  -    │
-│  ⏳ NFR-001 응답시간 최적화    [devops]   -    │
+│  ✓ FR-001  Email login         [backend]  Done│
+│  ✓ FR-002  OAuth integration   [backend]  Done│
+│  ~ FR-003  Password reset      [backend]  50% │
+│  ◯ FR-004  Session management  [backend]  -   │
+│  ◯ NFR-001 Response time opt   [devops]   -   │
 │                                               │
 └───────────────────────────────────────────────┘
 
 ┌─ Active Agents ───────────────────────────────┐
 │                                               │
-│  🤖 expert-backend    FR-003 작업 중           │
-│  💤 expert-security   대기 중                  │
-│  💤 expert-devops     대기 중                  │
+│  🤖 expert-backend    Working on FR-003       │
+│  💤 expert-security   Waiting                 │
+│  💤 expert-devops     Waiting                 │
 │                                               │
 └───────────────────────────────────────────────┘
 
@@ -91,28 +96,28 @@
 │                                               │
 └───────────────────────────────────────────────┘
 
-👉 Actions:
-   /forge:build AUTH-001    - 빌드 계속
-   /forge:resume AUTH-001   - 중단점에서 재개
-   /forge:verify AUTH-001   - 검증 실행
+Actions:
+   /forge:build AUTH-001    - Continue build
+   /forge:resume AUTH-001   - Resume from checkpoint
+   /forge:verify AUTH-001   - Run verification
 ```
 
-### 3. 정보 소스
+### 3. Information Sources
 
-상태 정보는 다음 파일에서 수집:
+Status information collected from:
 
-- `.forge/prds/{ID}.md` - PRD 메타데이터
-- `.forge/tasks/{ID}/tasks.json` - 태스크 현황
-- `.forge/progress/{ID}/checkpoint.json` - 진행 상황
-- `.forge/agents/{ID}/` - 생성된 에이전트
+- `.forge/prds/{ID}.md` - PRD metadata
+- `.forge/tasks/{ID}/tasks.json` - Task status
+- `.forge/progress/{ID}/checkpoint.json` - Progress
+- `.forge/agents/{ID}/` - Generated agents
 
-### 4. 상태 코드
+### 4. Status Codes
 
-| 상태 | 아이콘 | 설명 |
-|------|--------|------|
-| draft | 📝 | PRD 생성됨, 분석 전 |
-| analyzed | 🔍 | 분석 완료, 빌드 전 |
-| building | 🔨 | TDD 구현 중 |
-| paused | ⏸️ | 일시 중지됨 |
-| failed | ❌ | 실패 (재시도 필요) |
-| done | ✅ | 완료 |
+| Status | Icon | Description |
+|--------|------|-------------|
+| draft | 📝 | PRD created, not analyzed |
+| analyzed | 🔍 | Analysis complete, not built |
+| building | 🔨 | TDD implementation in progress |
+| paused | ⏸️ | Paused |
+| failed | ✗ | Failed (retry needed) |
+| done | ✓ | Complete |

@@ -1,121 +1,126 @@
-# /forge:resume - 중단된 작업 재개
+# /forge:resume - Resume Interrupted Work
 
-## 사용법
+## Usage
 
 ```
 /forge:resume AUTH-001
 ```
 
-## 입력
+## Input
 
-`$ARGUMENTS` - 재개할 PRD ID
+`$ARGUMENTS` - PRD ID to resume
 
-## 워크플로우
+## Language Configuration
 
-### 1. 체크포인트 확인
+Read from `.forge/config.json`:
+- Use `language.conversation` for resume messages and interactions
+
+## Workflow
+
+### 1. Checkpoint Check
 
 ```
-🔄 Resuming: AUTH-001
+Resuming: AUTH-001
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📍 Checkpoint found!
+Checkpoint found!
 ```
 
-체크포인트 파일 로드: `.forge/progress/{PRD_ID}/checkpoint.json`
+Load checkpoint file: `.forge/progress/{PRD_ID}/checkpoint.json`
 
-### 2. 상태 복원
+### 2. State Recovery
 
 ```
-📋 Previous State:
-   ├── Last Task: FR-003 (비밀번호 재설정)
+Previous State:
+   ├── Last Task: FR-003 (Password Reset)
    ├── Last Phase: GREEN
    ├── Completed: FR-001, FR-002
    ├── Pending: FR-004, NFR-001
    └── Last Updated: 2024-11-30 15:30
 
-📊 Progress: ████████████░░░░░░░░░░░░░░░░ 45%
+Progress: ████████████░░░░░░░░░░░░░░░░ 45%
 ```
 
-### 3. 재개 확인
+### 3. Resume Confirmation
 
-AskUserQuestion으로 확인:
+Confirm with AskUserQuestion:
 
 ```
-❓ 작업을 재개하시겠습니까?
+Resume work?
 
 Options:
-1. 중단점에서 계속 (FR-003 GREEN phase)
-2. 현재 태스크 처음부터 (FR-003 RED phase)
-3. 다음 태스크로 건너뛰기 (FR-004)
-4. 취소
+1. Continue from checkpoint (FR-003 GREEN phase)
+2. Restart current task (FR-003 RED phase)
+3. Skip to next task (FR-004)
+4. Cancel
 ```
 
-### 4. 작업 재개
+### 4. Resume Work
 
-선택에 따라 `/forge:build` 호출:
+Based on selection, call `/forge:build`:
 
-**Option 1: 중단점에서 계속**
+**Option 1: Continue from checkpoint**
 ```
-🔄 Resuming from checkpoint...
+Resuming from checkpoint...
 
-Task: FR-003 비밀번호 재설정
+Task: FR-003 Password Reset
 Phase: GREEN (continue)
 
-[GREEN phase 계속 진행]
+[Continue GREEN phase]
 ```
 
-**Option 2: 태스크 처음부터**
+**Option 2: Restart task**
 ```
-🔄 Restarting task FR-003...
+Restarting task FR-003...
 
-Task: FR-003 비밀번호 재설정
+Task: FR-003 Password Reset
 Phase: RED (restart)
 
-[TDD 사이클 처음부터]
+[TDD cycle from beginning]
 ```
 
-**Option 3: 다음 태스크로**
+**Option 3: Skip to next task**
 ```
-⏭️ Skipping to next task...
+Skipping to next task...
 
 Skipped: FR-003 (marked as skipped)
-Next: FR-004 세션 관리
+Next: FR-004 Session Management
 
-[FR-004부터 시작]
+[Start from FR-004]
 ```
 
-### 5. 체크포인트가 없을 때
+### 5. No Checkpoint Found
 
 ```
-⚠️ No checkpoint found for AUTH-001
+No checkpoint found for AUTH-001
 
-가능한 조치:
-1. /forge:build AUTH-001    - 처음부터 빌드
-2. /forge:status AUTH-001   - 상태 확인
+Available Actions:
+1. /forge:build AUTH-001    - Build from start
+2. /forge:status AUTH-001   - Check status
 ```
 
-### 6. 에러 복구
+### 6. Error Recovery
 
-이전 실패로 중단된 경우:
+If interrupted due to previous failure:
 
 ```
-❌ Previous Error Detected:
+Previous Error Detected:
 
 Task: FR-003
 Phase: GREEN
-Error: pytest failed - 2 tests failing
+Error: Tests failed - 2 tests failing
 
-📄 Error Log: .forge/progress/AUTH-001/error.log
+Error Log: .forge/progress/AUTH-001/error.log
 
 Options:
-1. 에러 로그 확인 후 재시도
-2. 수동으로 수정 후 재개
-3. 태스크 건너뛰기
+1. Review error log and retry
+2. Fix manually and resume
+3. Skip task
 ```
 
-### 7. 완료 후 상태 저장
+### 7. Save State After Resume
 
-재개 후 정상적으로 진행되면 체크포인트 업데이트:
+Update checkpoint after successful resume:
 
 ```json
 {

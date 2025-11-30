@@ -1,53 +1,114 @@
-# /forge:analyze - PRD 분석 및 에이전트 자동 생성
+# /forge:analyze - PRD Analysis and Dynamic Agent Generation
 
-## 사용법
+## Usage
 
 ```
 /forge:analyze AUTH-001
 /forge:analyze CHAT-002
 ```
 
-## 입력
+## Input
 
-`$ARGUMENTS` - 분석할 PRD ID
+`$ARGUMENTS` - PRD ID to analyze
 
-## 워크플로우
+## Description
 
-### 1. PRD 로드
+Analyzes PRD to automatically:
+1. **Detect domains** from requirements
+2. **Generate specialized agents** for each domain
+3. **Decompose tasks** with dependencies
+4. **Estimate complexity** and timeline
+
+## Language Configuration
+
+Read from `.forge/config.json`:
+- `language.conversation` for analysis responses
+- `language.output_documents` for generated files
+
+## Workflow
+
+### Phase 1: Load PRD
 
 ```
-📄 Loading: .forge/prds/{PRD_ID}.md
+Loading: .forge/prds/{PRD_ID}.md
 ```
 
-PRD 파일을 읽어 요구사항을 파싱합니다.
+Uses `lib.prd_analyzer.PRDAnalyzer` to parse PRD.
 
-### 2. 도메인 분석
+### Phase 2: Domain Analysis
 
-PRD의 요구사항에서 도메인 키워드를 추출합니다:
+**Domain Detection** (8 domains supported):
 
-| 키워드 | 도메인 | 에이전트 |
-|--------|--------|----------|
-| api, server, endpoint | Backend | expert-backend |
-| ui, component, page | Frontend | expert-frontend |
-| database, schema, query | Database | expert-database |
-| auth, oauth, jwt | Security | expert-security |
-| docker, deploy, ci/cd | DevOps | expert-devops |
+| Domain | Keywords | Agent |
+|--------|----------|-------|
+| Backend | api, server, endpoint, rest, graphql | expert-backend |
+| Frontend | ui, component, page, form, react | expert-frontend |
+| Database | database, schema, table, query, sql | expert-database |
+| Security | auth, oauth, jwt, token, encryption | expert-security |
+| DevOps | deploy, docker, kubernetes, ci/cd | expert-devops |
+| Testing | test, unit, integration, e2e, coverage | expert-testing |
+| Mobile | mobile, ios, android, app, flutter | expert-mobile |
+| AI/ML | ai, ml, llm, gpt, embedding | expert-ai |
 
-### 3. 에이전트 자동 생성
+**Confidence Scoring**:
+- 3+ keyword matches = High confidence (0.8-1.0)
+- 2 keyword matches = Medium confidence (0.5-0.7)
+- 1 keyword match = Low confidence (0.3-0.4)
 
-식별된 도메인별로 전문 에이전트를 생성합니다.
+### Phase 3: User Confirmation
 
-**저장 위치**: `.forge/agents/{PRD_ID}/expert-{domain}.md`
+Before generating agents, ask user:
 
-**에이전트 템플릿**:
+```
+📋 Agent Generation Plan for {PRD_ID}
+
+Detected Domains:
+  1. backend (confidence: 0.85) → expert-backend
+     Requirements: FR-001, FR-002, FR-005
+
+  2. frontend (confidence: 0.72) → expert-frontend
+     Requirements: FR-003, FR-004
+
+  3. database (confidence: 0.65) → expert-database
+     Requirements: FR-006
+
+Total: 3 agents, 6 requirements
+
+Generate these agents? [Y/n]
+```
+
+### Phase 4: Dynamic Agent Generation
+
+Uses `lib.agent_generator.AgentGenerator`:
+
+```python
+from lib.agent_generator import AgentGenerator
+
+generator = AgentGenerator(project_dir)
+result = generator.generate_agents_for_prd(prd_id, prd_content)
+```
+
+**Output Structure**:
+
+```
+.forge/agents/{PRD_ID}/
+├── index.json              # Agent registry
+├── expert-backend.md       # Backend specialist
+├── expert-frontend.md      # Frontend specialist
+├── expert-database.md      # Database specialist
+└── expert-{domain}.md      # Other domains
+```
+
+**Generated Agent Template**:
+
 ```markdown
 ---
 name: expert-{domain}
-description: {PRD_ID} {domain} 구현 전문가
+description: {PRD_ID} {domain} implementation specialist
 model: sonnet
 context:
   prd: {PRD_ID}
-  focus: [{할당된 FR 목록}]
+  domain: {domain}
 tools:
   - Read
   - Write
@@ -55,39 +116,51 @@ tools:
   - Bash
   - Grep
   - Glob
+skills:
+  - forge-foundation
 ---
 
 # {PRD_ID} {Domain} Expert
 
-## 담당 요구사항
-{PRD에서 할당된 요구사항}
+## Assigned Requirements
+{Requirements from PRD for this domain}
 
-## 기술 스택
-{PRD의 기술 스택}
+## Tech Stack
+{Relevant tech from PRD}
 
-## TDD 규칙
-1. 테스트 먼저 작성 (tests/ 디렉토리)
-2. 최소한의 코드로 통과
-3. 리팩토링
+## TDD Rules
+1. Write tests first (RED)
+2. Minimal code to pass (GREEN)
+3. Refactor (BLUE)
 ```
 
-### 4. 태스크 분해
+### Phase 5: Task Decomposition
 
-각 요구사항을 실행 가능한 태스크로 분해합니다.
-
-**저장 위치**: `.forge/tasks/{PRD_ID}/tasks.json`
+**Output**: `.forge/tasks/{PRD_ID}/tasks.json`
 
 ```json
 {
-  "prd_id": "{PRD_ID}",
-  "created": "{ISO-DATE}",
-  "total_tasks": {N},
+  "prd_id": "AUTH-001",
+  "created": "2025-11-30T12:00:00Z",
+  "total_tasks": 6,
+  "by_domain": {
+    "backend": 3,
+    "frontend": 2,
+    "database": 1
+  },
+  "by_complexity": {
+    "simple": 2,
+    "medium": 3,
+    "complex": 1
+  },
+  "estimated_hours": 12,
   "tasks": [
     {
       "id": "FR-001",
-      "title": "{태스크 제목}",
-      "agent": "expert-{domain}",
-      "dependencies": [],
+      "title": "Login API endpoint",
+      "agent": "expert-backend",
+      "domain": "backend",
+      "dependencies": ["FR-006"],
       "complexity": "medium",
       "status": "pending"
     }
@@ -95,42 +168,109 @@ tools:
 }
 ```
 
-### 5. PRD 업데이트
+### Phase 6: Update PRD Status
 
-분석 결과를 원본 PRD에 업데이트합니다:
-- Section 5: 예상 에이전트 → 실제 생성된 에이전트
-- Section 6: 태스크 분해 → 실제 태스크 목록
-- status: draft → analyzed
+Add analysis metadata to PRD:
 
-### 6. 완료 메시지
-
-```
-✅ PRD 분석 완료: {PRD_ID}
-
-🤖 생성된 에이전트 ({N}개):
-   📁 .forge/agents/{PRD_ID}/
-   ├── expert-backend.md    (FR-001, FR-002)
-   ├── expert-frontend.md   (FR-003)
-   └── expert-database.md   (FR-004)
-
-📋 태스크 분해 ({M}개):
-   1. [backend]  FR-001: 로그인 API 구현
-   2. [backend]  FR-002: OAuth 연동
-   3. [frontend] FR-003: 로그인 페이지 UI
-   4. [database] FR-004: 사용자 테이블 설계
-
-📊 복잡도 분석:
-   - Simple: 2개
-   - Medium: 1개
-   - Complex: 1개
-
-👉 다음 단계:
-   /forge:build {PRD_ID}  - TDD 구현 시작
-   /forge:status          - 상태 확인
+```markdown
+---
+status: analyzed
+analyzed_at: 2025-11-30T12:00:00Z
+generated_agents:
+  - expert-backend
+  - expert-frontend
+  - expert-database
+total_tasks: 6
+estimated_hours: 12
+---
 ```
 
-## 주의사항
+### Phase 7: Completion Report
 
-- Sequential-Thinking MCP를 사용하여 복잡한 분석 수행
-- Context7 MCP로 기술 스택의 최신 문서 참조
-- 에이전트 생성 전 사용자 확인 (AskUserQuestion)
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRD Analysis Complete: {PRD_ID}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 Domain Analysis:
+   Primary: backend (confidence: 0.85)
+   Secondary: frontend (0.72), database (0.65)
+
+🤖 Generated Agents (3):
+   .forge/agents/{PRD_ID}/
+   ├── expert-backend.md    → FR-001, FR-002, FR-005
+   ├── expert-frontend.md   → FR-003, FR-004
+   └── expert-database.md   → FR-006
+
+📋 Task Breakdown (6 tasks):
+   [backend]  FR-001: Login API (medium)
+   [backend]  FR-002: OAuth integration (complex)
+   [backend]  FR-005: Token validation (simple)
+   [frontend] FR-003: Login page UI (simple)
+   [frontend] FR-004: Dashboard (medium)
+   [database] FR-006: User schema (medium)
+
+📈 Complexity Summary:
+   Simple: 2  |  Medium: 3  |  Complex: 1
+
+⏱️ Estimated Time: ~12 hours
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Next Steps:
+  /forge:design {PRD_ID}  - Generate architecture diagrams
+  /forge:build {PRD_ID}   - Start TDD implementation
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+## MCP Integration
+
+- **Sequential-Thinking**: Complex domain analysis and dependency mapping
+- **Context7**: Latest library docs for tech stack decisions
+
+## Quality Checks
+
+- [ ] All requirements assigned to agents
+- [ ] No orphan requirements
+- [ ] Dependencies are acyclic (no circular deps)
+- [ ] Each domain has appropriate tools
+- [ ] Tech stack is compatible
+
+## Error Handling
+
+| Error | Resolution |
+|-------|------------|
+| PRD not found | Check `.forge/prds/{ID}.md` exists |
+| No requirements | Ensure PRD has FR-XXX format requirements |
+| Unknown domain | Assign to `expert-general` |
+| Circular deps | Report warning, suggest resolution |
+
+## Examples
+
+### Example 1: Simple PRD
+
+```
+/forge:analyze LOGIN-001
+
+→ Detected: backend, frontend
+→ Generated: 2 agents
+→ Tasks: 4
+```
+
+### Example 2: Complex PRD
+
+```
+/forge:analyze ECOMMERCE-001
+
+→ Detected: backend, frontend, database, security, devops
+→ Generated: 5 agents
+→ Tasks: 15
+```
+
+## Related Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/forge:idea` | Create PRD first |
+| `/forge:design` | Generate architecture diagrams |
+| `/forge:build` | Start TDD implementation |
+| `/forge:status` | Check analysis status |

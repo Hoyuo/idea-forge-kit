@@ -1,107 +1,245 @@
 # IdeaForge Project Instructions
 
-> **IdeaForge**: 아이디어에서 구현까지 자동화하는 AI 개발 킷
+> **IdeaForge**: AI development kit that automates from idea to implementation
 
 ---
 
-## 핵심 워크플로우
+## Core Workflow
 
 ```
-💡 아이디어 → 📋 PRD → 🤖 에이전트 → 🔨 TDD → ✅ 완료
+Idea → PRD → Design → Agents → TDD → Verify → Sync → Done
 
-/forge:idea     → PRD 생성
-/forge:analyze  → 에이전트 자동 생성 + 태스크 분해
-/forge:build    → TDD 구현 (RED-GREEN-REFACTOR)
-/forge:verify   → 요구사항 검증
+/forge:idea     → Generate PRD
+/forge:analyze  → Auto-generate agents + task breakdown (Dynamic Agent System)
+/forge:design   → Architecture diagrams (PlantUML)
+/forge:build    → TDD implementation (RED-GREEN-REFACTOR)
+/forge:verify   → Requirements verification
+/forge:sync     → Documentation synchronization
+/forge:dashboard → Real-time progress visualization
 ```
 
 ---
 
-## 슬래시 명령어
+## Slash Commands
 
-| 명령어 | 용도 |
-|--------|------|
-| `/forge:idea "아이디어"` | 아이디어를 PRD로 변환 |
-| `/forge:analyze {ID}` | PRD 분석, 에이전트/태스크 자동 생성 |
-| `/forge:build {ID}` | TDD 구현 시작 |
-| `/forge:verify {ID}` | 요구사항 검증 |
-| `/forge:status` | 현재 상태 확인 |
-| `/forge:list` | 모든 PRD 목록 |
-| `/forge:resume {ID}` | 중단된 작업 재개 |
+| Command | Purpose |
+|---------|---------|
+| `/forge:idea "idea"` | Transform idea into PRD |
+| `/forge:analyze {ID}` | Analyze PRD, auto-generate agents/tasks |
+| `/forge:design {ID}` | Generate architecture diagrams |
+| `/forge:build {ID}` | Start TDD implementation |
+| `/forge:verify {ID}` | Verify requirements |
+| `/forge:sync {ID}` | Synchronize documentation |
+| `/forge:dashboard` | Start progress dashboard (port 20555) |
+| `/forge:status` | Check current status |
+| `/forge:list` | List all PRDs |
+| `/forge:resume {ID}` | Resume interrupted work |
+| `/forge:feedback "msg"` | Submit feedback or report issues |
+| `/forge:help` | Show help |
 
 ---
 
-## 디렉토리 구조
+## Directory Structure
 
 ```
 .forge/
-├── prds/           # PRD 문서들
-├── tasks/          # 태스크 분해 결과
-├── agents/         # 동적 생성된 에이전트
-├── progress/       # 진행 상황 및 체크포인트
-├── reports/        # 검증 리포트
-└── config.json     # 설정
+├── prds/           # PRD documents
+├── tasks/          # Task breakdown results
+├── agents/         # Dynamically generated agents (per PRD)
+│   └── {PRD_ID}/   # Agent set for specific PRD
+├── progress/       # Progress and checkpoints
+├── design/         # Architecture diagrams (PlantUML)
+├── reports/        # Verification reports
+├── logs/           # Execution logs
+├── feedback/       # User feedback
+├── dashboard/      # Web dashboard server
+└── config.json     # Configuration
 
 .claude/
-├── agents/         # 기본 에이전트 (4개)
-├── commands/forge/ # 슬래시 명령어 (7개)
-├── skills/         # 스킬
-└── settings.json   # 권한 설정
+├── agents/forge/   # Base agents (9)
+├── commands/forge/ # Slash commands (12)
+├── hooks/          # Session hooks + lib/
+│   └── lib/        # Shared Python modules
+├── skills/         # Skills (forge-foundation)
+└── settings.json   # Permission settings
 ```
 
 ---
 
-## 에이전트 체계
+## Agent System
 
-### 기본 에이전트 (항상 포함)
+### Base Agents (Core)
 
-| 에이전트 | 역할 |
-|----------|------|
-| `forge-orchestrator` | 메인 오케스트레이터, 워크플로우 조율 |
-| `forge-prd-writer` | PRD 작성 전문가 |
-| `forge-analyzer` | PRD 분석, 에이전트/태스크 생성 |
-| `forge-tdd-runner` | TDD 사이클 실행 |
+| Agent | Role |
+|-------|------|
+| `forge-orchestrator` | Main orchestrator, workflow coordination |
+| `forge-prd-writer` | PRD writing specialist |
+| `forge-analyzer` | PRD analysis, dynamic agent generation (v2.0) |
+| `forge-tdd-runner` | TDD cycle execution |
 
-### 동적 생성 에이전트 (PRD 분석 후)
+### Manager Agents (Workflow)
 
-| 에이전트 | 도메인 |
-|----------|--------|
-| `expert-backend` | API, 서버, 인증 |
-| `expert-frontend` | UI, 컴포넌트 |
-| `expert-database` | 스키마, 쿼리 |
-| `expert-security` | 보안, 암호화 |
-| `expert-devops` | 배포, CI/CD |
+| Agent | Role |
+|-------|------|
+| `forge-designer` | Architecture diagram generation |
+| `forge-sync` | Documentation synchronization |
+| `forge-quality` | Test coverage and code quality |
+| `forge-git` | Git workflow management |
+| `forge-feedback` | Feedback collection and categorization |
+
+### Dynamic Agents (8 Domains)
+
+Generated automatically by `/forge:analyze` based on PRD content:
+
+| Agent | Domain | Keywords |
+|-------|--------|----------|
+| `expert-backend` | API, server | api, server, endpoint, rest, graphql |
+| `expert-frontend` | UI, components | ui, component, page, react, vue |
+| `expert-database` | Schema, queries | database, schema, table, sql, prisma |
+| `expert-security` | Security | auth, oauth, jwt, token, encryption |
+| `expert-devops` | Deployment | deploy, docker, kubernetes, ci/cd |
+| `expert-testing` | Testing | test, unit, integration, e2e |
+| `expert-mobile` | Mobile apps | mobile, ios, android, flutter |
+| `expert-ai` | AI/ML | ai, ml, llm, gpt, embedding |
 
 ---
 
-## TDD 워크플로우
+## Dynamic Agent System (v2.0)
+
+### How It Works
+
+1. **Domain Detection**: Analyze PRD for keywords
+2. **Confidence Scoring**: Calculate match confidence (0.0-1.0)
+3. **Agent Generation**: Create specialized agents per domain
+4. **Requirement Assignment**: Map FR-XXX to appropriate agents
+
+### Output Structure
 
 ```
-🔴 RED      → 테스트 작성, 실패 확인
-🟢 GREEN   → 최소 구현, 테스트 통과
-🔵 REFACTOR → 코드 개선, 테스트 유지
+.forge/agents/{PRD_ID}/
+├── index.json           # Agent registry with analysis
+├── expert-backend.md    # Backend specialist
+├── expert-frontend.md   # Frontend specialist
+└── expert-{domain}.md   # Other domain specialists
 ```
 
-각 태스크마다 이 사이클을 반복합니다.
+### Python Modules
+
+```python
+from lib.agent_generator import AgentGenerator
+from lib.prd_analyzer import PRDAnalyzer
+```
 
 ---
 
-## 체크포인트 시스템
+## TDD Workflow
 
-작업 중 언제든 중단해도 `.forge/progress/{ID}/checkpoint.json`에 상태가 저장됩니다.
+```
+🔴 RED      → Write tests, verify failure
+🟢 GREEN   → Minimal implementation, pass tests
+🔵 REFACTOR → Improve code, maintain tests
+```
 
-`/forge:resume {ID}`로 중단된 지점에서 재개할 수 있습니다.
-
----
-
-## MCP 서버
-
-- **Context7**: 최신 라이브러리 문서 참조 (할루시네이션 방지)
-- **Sequential-Thinking**: 복잡한 분석 및 설계
+This cycle repeats for each task.
 
 ---
 
-## 언어 설정
+## Git Strategy (3-Mode System)
 
-기본 응답 언어: 한국어
-코드 주석: 영어/한국어 혼용 가능
+Configure in `.forge/config.json` → `git_strategy.mode`:
+
+| Mode | Environment | Auto Branch | Auto Commit | Auto Push | Auto PR |
+|------|-------------|-------------|-------------|-----------|---------|
+| `manual` | Local | ❌ | ✅ | ❌ | ❌ |
+| `personal` | GitHub | ✅ | ✅ | ✅ | ❌ |
+| `team` | GitHub | ✅ | ✅ | ✅ | ✅ (draft) |
+
+---
+
+## Document Management
+
+Configure in `.forge/config.json` → `document_management`:
+
+- **auto_sync**: Auto-run `/forge:sync` after build
+- **sections**: readme, api, diagrams, tests, changelog
+- **cleanup**: Auto-cleanup old logs/reports
+
+---
+
+## Dashboard
+
+Real-time progress visualization server:
+
+```bash
+cd .forge/dashboard
+npm install
+npm start
+# → http://localhost:20555
+```
+
+Features:
+- PRD list & progress
+- TDD phase visualization (🔴🟢🔵)
+- Test results & coverage
+- PlantUML diagram preview
+
+---
+
+## Hooks System
+
+### Session Hooks
+
+| Hook | Purpose |
+|------|---------|
+| `SessionStart` | Initialize session, show project info |
+| `SessionEnd` | Save metrics, cleanup, show summary |
+
+### Hook Library (`.claude/hooks/lib/`)
+
+| Module | Purpose |
+|--------|---------|
+| `config.py` | Configuration management |
+| `checkpoint.py` | Progress checkpoints |
+| `paths.py` | Path utilities |
+| `agent_generator.py` | Dynamic agent generation |
+| `prd_analyzer.py` | PRD analysis utilities |
+
+---
+
+## Checkpoint System
+
+Work state is saved to `.forge/progress/{ID}/checkpoint.json` whenever interrupted.
+
+Use `/forge:resume {ID}` to continue from where you left off.
+
+---
+
+## MCP Servers
+
+- **Context7**: Latest library documentation reference (hallucination prevention)
+- **Sequential-Thinking**: Complex analysis and design
+
+---
+
+## Language Configuration
+
+Read from `.forge/config.json`:
+- `language.conversation`: AI response language
+- `language.output_documents`: PRD/report language
+
+Supported languages: en, ko, ja, zh
+
+---
+
+## Quality Standards
+
+- Test coverage target: 80% (configurable)
+- Lint: No errors
+- Type check: No errors
+- Security: No vulnerabilities
+
+---
+
+## Version
+
+IdeaForge v0.1.0

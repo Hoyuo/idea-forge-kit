@@ -1,6 +1,6 @@
-# /forge:list - 모든 PRD 목록
+# /forge:list - List All PRDs
 
-## 사용법
+## Usage
 
 ```
 /forge:list
@@ -8,80 +8,85 @@
 /forge:list --sort date
 ```
 
-## 워크플로우
+## Language Configuration
 
-### 1. PRD 목록 표시
+Read from `.forge/config.json`:
+- Use `language.conversation` for list display language
 
-`.forge/prds/` 디렉토리의 모든 PRD를 스캔합니다.
+## Workflow
+
+### 1. Display PRD List
+
+Scan all PRDs in `.forge/prds/` directory.
 
 ```
-📋 IdeaForge PRD List
+IdeaForge PRD List
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ┌────────────────────────────────────────────────────────────┐
 │  ID        Title                Status      Progress  Date │
 ├────────────────────────────────────────────────────────────┤
-│  AUTH-001  사용자 인증 시스템     🔨 building    45%   11/30 │
-│  CHAT-002  실시간 채팅 기능       📝 draft        0%   11/29 │
-│  API-003   REST API 설계         ✅ done       100%   11/28 │
-│  UI-004    대시보드 UI           🔍 analyzed     0%   11/27 │
+│  AUTH-001  User Auth System     🔨 building    45%   11/30 │
+│  CHAT-002  Real-time Chat       📝 draft        0%   11/29 │
+│  API-003   REST API Design      ✓ done        100%   11/28 │
+│  UI-004    Dashboard UI         🔍 analyzed     0%   11/27 │
 └────────────────────────────────────────────────────────────┘
 
 Total: 4 PRDs
 ├── 📝 Draft: 1
 ├── 🔍 Analyzed: 1
 ├── 🔨 Building: 1
-└── ✅ Done: 1
+└── ✓ Done: 1
 
-👉 Actions:
-   /forge:status {ID}    - 상세 상태
-   /forge:build {ID}     - 빌드 시작/계속
-   /forge:idea "..."     - 새 PRD 생성
+Actions:
+   /forge:status {ID}    - Detailed status
+   /forge:build {ID}     - Start/continue build
+   /forge:idea "..."     - Create new PRD
 ```
 
-### 2. 필터 옵션
+### 2. Filter Options
 
-**상태별 필터**:
+**Filter by status**:
 ```
 /forge:list --status draft
 /forge:list --status building
 /forge:list --status done
 ```
 
-**정렬**:
+**Sort**:
 ```
-/forge:list --sort date     # 날짜순 (기본)
-/forge:list --sort name     # 이름순
-/forge:list --sort progress # 진행률순
+/forge:list --sort date     # By date (default)
+/forge:list --sort name     # By name
+/forge:list --sort progress # By progress
 ```
 
-### 3. PRD 메타데이터 파싱
+### 3. PRD Metadata Parsing
 
-각 PRD 파일의 frontmatter에서 정보 추출:
+Extract information from each PRD file's frontmatter:
 
 ```yaml
 ---
 id: AUTH-001
-title: "사용자 인증 시스템"
+title: "User Authentication System"
 status: building
 created: 2024-11-30
 priority: high
 ---
 ```
 
-### 4. 진행률 계산
+### 4. Progress Calculation
 
-`.forge/tasks/{ID}/tasks.json`에서:
-- 완료된 태스크 수 / 전체 태스크 수 × 100%
+From `.forge/tasks/{ID}/tasks.json`:
+- Completed tasks / Total tasks × 100%
 
-### 5. 빈 목록일 때
+### 5. Empty List
 
 ```
-📋 IdeaForge PRD List
+IdeaForge PRD List
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 (No PRDs found)
 
-👉 시작하기:
-   /forge:idea "당신의 아이디어"
+Get Started:
+   /forge:idea "your idea"
 ```

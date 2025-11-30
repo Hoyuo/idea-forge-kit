@@ -1,86 +1,91 @@
-# /forge:build - TDD 구현 실행
+# /forge:build - TDD Implementation Execution
 
-## 사용법
+## Usage
 
 ```
 /forge:build AUTH-001
 /forge:build CHAT-002 --task FR-003
 ```
 
-## 입력
+## Input
 
-`$ARGUMENTS` - PRD ID (선택적으로 특정 태스크 지정)
+`$ARGUMENTS` - PRD ID (optionally specify a specific task)
 
-## 워크플로우
+## Language Configuration
 
-### 1. 준비 단계
+Read from `.forge/config.json`:
+- Use `language.conversation` for progress messages and interaction
+
+## Workflow
+
+### 1. Preparation Phase
 
 ```
-🔨 IdeaForge Build: {PRD_ID}
+IdeaForge Build: {PRD_ID}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-1. `.forge/tasks/{PRD_ID}/tasks.json` 로드
-2. `.forge/progress/{PRD_ID}/checkpoint.json` 확인 (재개 여부)
-3. 생성된 에이전트 목록 확인
+1. Load `.forge/tasks/{PRD_ID}/tasks.json`
+2. Check `.forge/progress/{PRD_ID}/checkpoint.json` (for resume)
+3. Verify generated agents list
 
-### 2. TDD 사이클
+### 2. TDD Cycle
 
-각 태스크에 대해 RED-GREEN-REFACTOR 실행:
+Execute RED-GREEN-REFACTOR for each task:
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  Task 1/5: FR-001 이메일/비밀번호 로그인         │
+│  Task 1/5: FR-001 Email/Password Login          │
 ├─────────────────────────────────────────────────┤
 │                                                 │
-│  🔴 RED Phase                                   │
-│  ├── 테스트 파일 생성: tests/test_auth.py       │
-│  ├── 테스트 케이스 작성                          │
+│  RED Phase                                      │
+│  ├── Create test file: tests/test_auth.*       │
+│  ├── Write test cases                          │
 │  │   └── test_login_with_valid_credentials     │
 │  │   └── test_login_with_invalid_password      │
 │  │   └── test_login_with_nonexistent_user      │
-│  └── pytest 실행 → 3 failed ✓                  │
+│  └── Run tests → 3 failed ✓                    │
 │                                                 │
-│  🟢 GREEN Phase                                 │
-│  ├── 구현 파일 생성: src/auth/login.py          │
-│  ├── 최소 구현 코드 작성                         │
-│  └── pytest 실행 → 3 passed ✓                  │
+│  GREEN Phase                                    │
+│  ├── Create impl file: src/auth/login.*        │
+│  ├── Write minimal implementation              │
+│  └── Run tests → 3 passed ✓                    │
 │                                                 │
-│  🔵 REFACTOR Phase                              │
-│  ├── 코드 리뷰 및 개선                           │
-│  ├── 중복 제거                                   │
-│  └── pytest 실행 → 3 passed ✓                  │
+│  REFACTOR Phase                                 │
+│  ├── Code review and improvement               │
+│  ├── Remove duplication                        │
+│  └── Run tests → 3 passed ✓                    │
 │                                                 │
-│  ✅ Task Complete!                              │
+│  Task Complete!                                 │
 └─────────────────────────────────────────────────┘
 ```
 
-### 3. 에이전트 위임
+### 3. Agent Delegation
 
-각 태스크의 도메인에 맞는 에이전트에게 위임:
+Delegate to domain-appropriate agent for each task:
 
-```python
-# Backend 태스크
+```
+# Backend task delegation (language-agnostic)
 Task(subagent_type="expert-backend", prompt="""
 PRD: {PRD_ID}
 Task: {TASK_ID} - {TASK_TITLE}
 
 ## TDD Phase: RED
-1. tests/ 디렉토리에 테스트 파일 생성
-2. 요구사항에 맞는 테스트 케이스 작성
-3. pytest 실행하여 실패 확인
+1. Create test file in tests/ directory
+2. Write test cases for requirements
+3. Run tests to verify failure
 
-## 요구사항
-{PRD에서 추출한 요구사항}
+## Requirements
+{Requirements extracted from PRD}
 
-## 기술 스택
-{PRD의 기술 스택}
+## Tech Stack
+{Tech stack from PRD - determines test runner}
 """)
 ```
 
-### 4. 체크포인트 저장
+### 4. Checkpoint Saving
 
-각 태스크/페이즈 완료 시 자동 저장:
+Auto-save on each task/phase completion:
 
 `.forge/progress/{PRD_ID}/checkpoint.json`:
 ```json
@@ -102,81 +107,81 @@ Task: {TASK_ID} - {TASK_TITLE}
 }
 ```
 
-### 5. 진행 상황 표시
+### 5. Progress Display
 
-실시간 진행 상황:
+Real-time progress:
 
 ```
-🔨 Building: AUTH-001
+Building: AUTH-001
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 Progress: ████████████░░░░░░░░░░░░░░░░ 45%
+Progress: ████████████░░░░░░░░░░░░░░░░ 45%
 
-✅ Completed (2/5):
-   ├── FR-001: 이메일 로그인 ✓
-   └── FR-002: OAuth 연동 ✓
+Completed (2/5):
+   ├── FR-001: Email login ✓
+   └── FR-002: OAuth integration ✓
 
-🔄 In Progress:
-   └── FR-003: 비밀번호 재설정 [GREEN phase]
+In Progress:
+   └── FR-003: Password reset [GREEN phase]
 
-⏳ Pending (2):
-   ├── FR-004: 세션 관리
-   └── NFR-001: 응답시간 최적화
+Pending (2):
+   ├── FR-004: Session management
+   └── NFR-001: Response time optimization
 
-📊 Test Summary:
+Test Summary:
    Tests: 12 passed, 0 failed
    Coverage: 78%
 
-⏱️  Elapsed: 1h 23m
-📈 Est. Remaining: 1h 45m
+Elapsed: 1h 23m
+Est. Remaining: 1h 45m
 ```
 
-### 6. 완료 메시지
+### 6. Completion Message
 
 ```
-✅ Build 완료: {PRD_ID}
+Build Complete: {PRD_ID}
 
-📊 Summary:
-   ├── Tasks: 5/5 완료
+Summary:
+   ├── Tasks: 5/5 completed
    ├── Tests: 24 passed, 0 failed
    ├── Coverage: 87%
    └── Duration: 3h 15m
 
-📁 Generated Files:
+Generated Files:
    ├── src/auth/login.py
    ├── src/auth/oauth.py
    ├── src/auth/password.py
    ├── tests/test_auth.py
    └── tests/test_oauth.py
 
-👉 다음 단계:
-   /forge:verify {PRD_ID}  - 요구사항 검증
-   /forge:status           - 상태 확인
+Next Steps:
+   /forge:verify {PRD_ID}  - Verify requirements
+   /forge:status           - Check status
 ```
 
-## 실패 처리
+## Failure Handling
 
-테스트 실패 또는 에러 발생 시:
+On test failure or error:
 
 ```
-⚠️ Build 중단: {PRD_ID}
+Build Interrupted: {PRD_ID}
 
-❌ 실패 위치:
+Failure Location:
    Task: FR-003
    Phase: GREEN
-   Error: pytest failed (2 tests)
+   Error: Tests failed (2 tests)
 
-💾 체크포인트 저장됨:
+Checkpoint Saved:
    .forge/progress/{PRD_ID}/checkpoint.json
 
-🔧 해결 방법:
-   1. 에러 로그 확인: .forge/progress/{PRD_ID}/error.log
-   2. 수동 수정 후 재개: /forge:resume {PRD_ID}
-   3. 특정 태스크만 재시도: /forge:build {PRD_ID} --task FR-003
+Resolution Options:
+   1. Check error log: .forge/progress/{PRD_ID}/error.log
+   2. Fix manually and resume: /forge:resume {PRD_ID}
+   3. Retry specific task: /forge:build {PRD_ID} --task FR-003
 ```
 
-## 옵션
+## Options
 
-- `--task {TASK_ID}`: 특정 태스크만 실행
-- `--skip-tests`: 테스트 건너뛰기 (권장하지 않음)
-- `--verbose`: 상세 로그 출력
+- `--task {TASK_ID}`: Execute specific task only
+- `--skip-tests`: Skip tests (not recommended)
+- `--verbose`: Detailed log output

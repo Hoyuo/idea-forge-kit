@@ -1,6 +1,6 @@
 {
   "companyAnnouncements": [
-    "🔥 IdeaForge | /forge:help 로 시작하세요"
+    "🔥 IdeaForge | idea → analyze → build → verify"
   ],
   "statusLine": {
     "type": "command",
@@ -14,6 +14,17 @@
           {
             "type": "command",
             "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session_start.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/session_end.py",
             "timeout": 10
           }
         ]
@@ -38,14 +49,10 @@
       "Bash(git log:*)",
       "Bash(git diff:*)",
       "Bash(git branch:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
-      "Bash(pytest:*)",
-      "Bash(ruff:*)",
-      "Bash(mypy:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(mkdir:*)",
+      "Bash(make:*)",
       "mcp__context7__resolve-library-id",
       "mcp__context7__get-library-docs",
       "mcp__sequential-thinking__sequentialthinking"
