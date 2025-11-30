@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "project_name": "",
+  "language": "ko",
+  "auto_agent_generation": true,
+  "tdd_enabled": true,
+  "checkpoint_enabled": true,
+  "test_coverage_target": 80,
+  "created_at": ""
+}

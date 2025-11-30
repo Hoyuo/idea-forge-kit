@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IdeaForge Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <span class="logo">IdeaForge</span>
+        <span class="badge">Dashboard</span>
+      </div>
+      <div class="header-right">
+        <span class="connection-status" id="connectionStatus">
+          <span class="status-dot"></span>
+          <span class="status-text">Connecting...</span>
+        </span>
+        <button class="btn-refresh" onclick="refreshAll()">Refresh</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- Summary Cards -->
+      <section class="summary-section">
+        <div class="summary-card" id="totalPrds">
+          <div class="summary-icon">📋</div>
+          <div class="summary-content">
+            <span class="summary-value">-</span>
+            <span class="summary-label">Total PRDs</span>
+          </div>
+        </div>
+        <div class="summary-card" id="completedPrds">
+          <div class="summary-icon">✅</div>
+          <div class="summary-content">
+            <span class="summary-value">-</span>
+            <span class="summary-label">Completed</span>
+          </div>
+        </div>
+        <div class="summary-card" id="inProgressPrds">
+          <div class="summary-icon">🔨</div>
+          <div class="summary-content">
+            <span class="summary-value">-</span>
+            <span class="summary-label">In Progress</span>
+          </div>
+        </div>
+        <div class="summary-card" id="testStats">
+          <div class="summary-icon">🧪</div>
+          <div class="summary-content">
+            <span class="summary-value">-</span>
+            <span class="summary-label">Test Pass Rate</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRD List -->
+      <section class="prd-section">
+        <div class="section-header">
+          <h2>PRD List</h2>
+          <span class="section-subtitle">Click to view details</span>
+        </div>
+        <div class="prd-list" id="prdList">
+          <div class="loading">Loading PRDs...</div>
+        </div>
+      </section>
+
+      <!-- Detail Panel (Hidden by default) -->
+      <section class="detail-section" id="detailSection" style="display: none;">
+        <div class="section-header">
+          <h2 id="detailTitle">PRD Details</h2>
+          <button class="btn-close" onclick="closeDetail()">Close</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" data-tab="tasks" onclick="switchTab('tasks')">Tasks</button>
+          <button class="tab" data-tab="progress" onclick="switchTab('progress')">Progress</button>
+          <button class="tab" data-tab="diagrams" onclick="switchTab('diagrams')">Diagrams</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="tabContent">
+          <!-- Tasks Tab -->
+          <div class="tab-panel active" id="tasksPanel">
+            <div class="tasks-list" id="tasksList">
+              <div class="loading">Loading tasks...</div>
+            </div>
+          </div>
+
+          <!-- Progress Tab -->
+          <div class="tab-panel" id="progressPanel">
+            <div class="progress-info" id="progressInfo">
+              <div class="loading">Loading progress...</div>
+            </div>
+          </div>
+
+          <!-- Diagrams Tab -->
+          <div class="tab-panel" id="diagramsPanel">
+            <div class="diagrams-list" id="diagramsList">
+              <div class="loading">Loading diagrams...</div>
+            </div>
+            <div class="diagram-preview" id="diagramPreview">
+              <div class="empty-state">Select a diagram to preview</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>IdeaForge Dashboard</span>
+      <span class="separator">|</span>
+      <span id="lastUpdate">Last update: -</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

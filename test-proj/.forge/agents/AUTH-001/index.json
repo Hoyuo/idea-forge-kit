@@ -1,0 +1,190 @@
+{
+  "prd_id": "AUTH-001",
+  "generated_at": "2025-11-30T12:23:12.268339",
+  "total_agents": 6,
+  "agents": [
+    {
+      "name": "expert-backend",
+      "domain": "backend",
+      "path": "/Users/sanghyunpark/Documents/temp/idea-forge-kit/test-proj/.forge/agents/AUTH-001/expert-backend.md",
+      "requirements": [],
+      "confidence": 0.6666666666666666
+    },
+    {
+      "name": "expert-frontend",
+      "domain": "frontend",
+      "path": "/Users/sanghyunpark/Documents/temp/idea-forge-kit/test-proj/.forge/agents/AUTH-001/expert-frontend.md",
+      "requirements": [
+        "FR-003"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "name": "expert-database",
+      "domain": "database",
+      "path": "/Users/sanghyunpark/Documents/temp/idea-forge-kit/test-proj/.forge/agents/AUTH-001/expert-database.md",
+      "requirements": [
+        "FR-006"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "name": "expert-security",
+      "domain": "security",
+      "path": "/Users/sanghyunpark/Documents/temp/idea-forge-kit/test-proj/.forge/agents/AUTH-001/expert-security.md",
+      "requirements": [
+        "FR-001",
+        "FR-002",
+        "FR-005"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "name": "expert-testing",
+      "domain": "testing",
+      "path": "/Users/sanghyunpark/Documents/temp/idea-forge-kit/test-proj/.forge/agents/AUTH-001/expert-testing.md",
+      "requirements": [],
+      "confidence": 0.3333333333333333
+    },
+    {
+      "name": "expert-ai",
+      "domain": "ai",
+      "path": "/Users/sanghyunpark/Documents/temp/idea-forge-kit/test-proj/.forge/agents/AUTH-001/expert-ai.md",
+      "requirements": [],
+      "confidence": 0.3333333333333333
+    }
+  ],
+  "analysis": {
+    "domains": {
+      "backend": {
+        "agent": "expert-backend",
+        "keywords": [
+          "api",
+          "backend"
+        ],
+        "confidence": 0.6666666666666666,
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob"
+        ],
+        "skills": [
+          "forge-foundation"
+        ]
+      },
+      "frontend": {
+        "agent": "expert-frontend",
+        "keywords": [
+          "ui",
+          "page",
+          "form",
+          "react",
+          "frontend",
+          "responsive"
+        ],
+        "confidence": 1.0,
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob"
+        ],
+        "skills": [
+          "forge-foundation"
+        ]
+      },
+      "database": {
+        "agent": "expert-database",
+        "keywords": [
+          "database",
+          "schema",
+          "table",
+          "postgresql",
+          "model",
+          "prisma"
+        ],
+        "confidence": 1.0,
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob"
+        ],
+        "skills": [
+          "forge-foundation"
+        ]
+      },
+      "security": {
+        "agent": "expert-security",
+        "keywords": [
+          "security",
+          "auth",
+          "authentication",
+          "oauth",
+          "jwt",
+          "token",
+          "password"
+        ],
+        "confidence": 1.0,
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob"
+        ],
+        "skills": [
+          "forge-foundation"
+        ]
+      },
+      "testing": {
+        "agent": "expert-testing",
+        "keywords": [
+          "integration"
+        ],
+        "confidence": 0.3333333333333333,
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob"
+        ],
+        "skills": [
+          "forge-foundation"
+        ]
+      },
+      "ai": {
+        "agent": "expert-ai",
+        "keywords": [
+          "model"
+        ],
+        "confidence": 0.3333333333333333,
+        "tools": [
+          "Read",
+          "Write",
+          "Edit",
+          "Bash",
+          "Grep",
+          "Glob",
+          "mcp__context7__resolve-library-id",
+          "mcp__context7__get-library-docs"
+        ],
+        "skills": [
+          "forge-foundation"
+        ]
+      }
+    },
+    "total_domains": 6,
+    "primary_domain": "frontend"
+  }
+}

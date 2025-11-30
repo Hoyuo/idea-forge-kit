@@ -1,0 +1,159 @@
+{
+  "prd_id": "CHAT-001",
+  "created": "2025-11-30T00:00:00Z",
+  "total_tasks": 11,
+  "phases": [
+    {
+      "name": "Phase 1: 기반 설정",
+      "tasks": ["TASK-001", "TASK-002"]
+    },
+    {
+      "name": "Phase 2: 인증 시스템",
+      "tasks": ["TASK-003", "TASK-004"]
+    },
+    {
+      "name": "Phase 3: 핵심 채팅 기능",
+      "tasks": ["TASK-005", "TASK-006", "TASK-007", "TASK-008", "TASK-009"]
+    },
+    {
+      "name": "Phase 4: 부가 기능",
+      "tasks": ["TASK-010", "TASK-011"]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "title": "프로젝트 초기화 및 의존성 설정",
+      "description": "pyproject.toml 생성, FastAPI 및 관련 패키지 설치, 프로젝트 구조 생성",
+      "agent": "expert-backend",
+      "requirements": [],
+      "dependencies": [],
+      "complexity": "simple",
+      "status": "pending",
+      "estimated_tests": 0
+    },
+    {
+      "id": "TASK-002",
+      "title": "데이터베이스 스키마 설계",
+      "description": "User, ChatRoom, Message 모델 정의, SQLAlchemy 모델 작성, 마이그레이션 설정",
+      "agent": "expert-database",
+      "requirements": ["FR-001", "FR-003", "FR-006"],
+      "dependencies": ["TASK-001"],
+      "complexity": "medium",
+      "status": "pending",
+      "estimated_tests": 5
+    },
+    {
+      "id": "TASK-003",
+      "title": "사용자 인증 API (회원가입, 로그인)",
+      "description": "회원가입, 로그인 API 구현, 비밀번호 해시화, 사용자 검증",
+      "agent": "expert-security",
+      "requirements": ["FR-001"],
+      "dependencies": ["TASK-002"],
+      "complexity": "medium",
+      "status": "pending",
+      "estimated_tests": 8
+    },
+    {
+      "id": "TASK-004",
+      "title": "JWT 토큰 발급 및 검증 미들웨어",
+      "description": "Access/Refresh 토큰 발급, 토큰 검증 미들웨어, get_current_user 의존성",
+      "agent": "expert-security",
+      "requirements": ["FR-001"],
+      "dependencies": ["TASK-003"],
+      "complexity": "medium",
+      "status": "pending",
+      "estimated_tests": 6
+    },
+    {
+      "id": "TASK-005",
+      "title": "사용자 목록 조회 API",
+      "description": "전체 사용자 목록 조회, 사용자 검색 기능",
+      "agent": "expert-backend",
+      "requirements": ["FR-002"],
+      "dependencies": ["TASK-002", "TASK-004"],
+      "complexity": "simple",
+      "status": "pending",
+      "estimated_tests": 3
+    },
+    {
+      "id": "TASK-006",
+      "title": "채팅방 생성 API",
+      "description": "1:1 채팅방 생성, 기존 채팅방 확인, 채팅방 목록 조회",
+      "agent": "expert-backend",
+      "requirements": ["FR-003"],
+      "dependencies": ["TASK-002", "TASK-004"],
+      "complexity": "medium",
+      "status": "pending",
+      "estimated_tests": 5
+    },
+    {
+      "id": "TASK-007",
+      "title": "WebSocket 연결 관리자 구현",
+      "description": "ConnectionManager 클래스, 연결/해제 처리, 사용자별 연결 관리",
+      "agent": "expert-backend",
+      "requirements": ["FR-004", "FR-005", "NFR-004"],
+      "dependencies": ["TASK-004"],
+      "complexity": "complex",
+      "status": "pending",
+      "estimated_tests": 7
+    },
+    {
+      "id": "TASK-008",
+      "title": "실시간 메시지 송수신",
+      "description": "메시지 브로드캐스트, 특정 채팅방 멤버에게 전송, 메시지 저장",
+      "agent": "expert-backend",
+      "requirements": ["FR-004", "FR-005", "NFR-001"],
+      "dependencies": ["TASK-006", "TASK-007"],
+      "complexity": "complex",
+      "status": "pending",
+      "estimated_tests": 8
+    },
+    {
+      "id": "TASK-009",
+      "title": "메시지 히스토리 API",
+      "description": "채팅방별 메시지 조회, 페이지네이션, 시간순 정렬",
+      "agent": "expert-backend",
+      "requirements": ["FR-006"],
+      "dependencies": ["TASK-006"],
+      "complexity": "simple",
+      "status": "pending",
+      "estimated_tests": 4
+    },
+    {
+      "id": "TASK-010",
+      "title": "읽음 표시 기능",
+      "description": "메시지 읽음 상태 저장, 읽음 표시 API",
+      "agent": "expert-database",
+      "requirements": ["FR-007"],
+      "dependencies": ["TASK-008"],
+      "complexity": "simple",
+      "status": "pending",
+      "estimated_tests": 3
+    },
+    {
+      "id": "TASK-011",
+      "title": "온라인 상태 관리",
+      "description": "Redis 기반 온라인 상태 저장, 상태 변경 알림",
+      "agent": "expert-backend",
+      "requirements": ["FR-008"],
+      "dependencies": ["TASK-007"],
+      "complexity": "medium",
+      "status": "pending",
+      "estimated_tests": 4
+    }
+  ],
+  "summary": {
+    "by_complexity": {
+      "simple": 4,
+      "medium": 5,
+      "complex": 2
+    },
+    "by_agent": {
+      "expert-backend": 6,
+      "expert-database": 2,
+      "expert-security": 2
+    },
+    "total_estimated_tests": 53
+  }
+}
