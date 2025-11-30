@@ -10,7 +10,12 @@
   "language": {
     "conversation": "ko",
     "output_documents": "ko",
-    "supported": ["en", "ko", "ja", "zh"],
+    "supported": [
+      "en",
+      "ko",
+      "ja",
+      "zh"
+    ],
     "_notes": "conversation: AI response language, output_documents: PRD/report language"
   },
   "workflow": {
@@ -26,7 +31,6 @@
   "git_strategy": {
     "mode": "manual",
     "_notes": "3-Mode System: manual (local only), personal (GitHub individual), team (GitHub team)",
-
     "manual": {
       "environment": "local",
       "auto_branch": false,
@@ -58,10 +62,17 @@
       "main_branch": "main",
       "_notes": "GitHub team project. Full automation with governance."
     },
-
     "commit_style": {
       "format": "conventional",
-      "types": ["feat", "fix", "docs", "style", "refactor", "test", "chore"],
+      "types": [
+        "feat",
+        "fix",
+        "docs",
+        "style",
+        "refactor",
+        "test",
+        "chore"
+      ],
       "scope_required": false
     },
     "hooks": {
@@ -73,7 +84,6 @@
     "enabled": true,
     "auto_sync": false,
     "_notes": "auto_sync: Automatically run /forge:sync after /forge:build",
-
     "directories": {
       "prds": ".forge/prds/",
       "tasks": ".forge/tasks/",
@@ -83,19 +93,35 @@
       "agents": ".forge/agents/",
       "logs": ".forge/logs/"
     },
-
     "sections": {
-      "readme": { "enabled": true, "auto_update": true },
-      "api": { "enabled": true, "format": "markdown" },
-      "diagrams": { "enabled": true, "format": "plantuml" },
-      "tests": { "enabled": true, "include_coverage": true },
-      "changelog": { "enabled": true, "format": "keepachangelog" }
+      "readme": {
+        "enabled": true,
+        "auto_update": true
+      },
+      "api": {
+        "enabled": true,
+        "format": "markdown"
+      },
+      "diagrams": {
+        "enabled": true,
+        "format": "plantuml"
+      },
+      "tests": {
+        "enabled": true,
+        "include_coverage": true
+      },
+      "changelog": {
+        "enabled": true,
+        "format": "keepachangelog"
+      }
     },
-
     "cleanup": {
       "enabled": true,
       "retention_days": 30,
-      "targets": [".forge/logs/*", ".forge/reports/*.tmp"]
+      "targets": [
+        ".forge/logs/*",
+        ".forge/reports/*.tmp"
+      ]
     }
   },
   "dashboard": {
@@ -114,5 +140,6 @@
     "context7": true,
     "sequential_thinking": true,
     "_notes": "MCP server integrations"
-  }
+  },
+  "template_version": "0.2.0"
 }
