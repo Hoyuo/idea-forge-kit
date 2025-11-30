@@ -85,6 +85,7 @@ claude
 | 명령어 | 설명 |
 |--------|------|
 | `forge init [path]` | 프로젝트 초기화 |
+| `forge upgrade` | 최신 버전으로 업그레이드 |
 | `forge doctor` | 시스템 요구사항 확인 |
 | `forge status` | 프로젝트 상태 |
 | `forge list` | PRD 목록 |

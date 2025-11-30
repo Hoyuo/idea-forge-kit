@@ -345,5 +345,118 @@ def list_prds():
     console.print(table)
 
 
+@cli.command()
+def upgrade():
+    """Upgrade IdeaForge templates to the latest version.
+
+    Updates .claude/ directory (agents, commands, hooks, skills) while
+    preserving user data in .forge/ (PRDs, agents, progress, config).
+
+    Example:
+        forge upgrade
+    """
+    print_banner()
+
+    cwd = Path.cwd()
+    forge_dir = cwd / ".forge"
+    claude_dir = cwd / ".claude"
+
+    # Check if this is an IdeaForge project
+    if not forge_dir.exists():
+        console.print("[red]✗ Not an IdeaForge project[/red]")
+        console.print("  Run: [bold]forge init .[/bold] to initialize")
+        return
+
+    # Get current version from config
+    config_path = forge_dir / "config.json"
+    current_version = "unknown"
+    if config_path.exists():
+        import json
+        try:
+            config = json.loads(config_path.read_text())
+            current_version = config.get("version", "unknown")
+        except json.JSONDecodeError:
+            pass
+
+    console.print(f"[bold]Upgrade IdeaForge[/bold]\n")
+    console.print(f"  Current version: [yellow]{current_version}[/yellow]")
+    console.print(f"  Target version:  [green]{__version__}[/green]\n")
+
+    if current_version == __version__:
+        console.print("[green]✓ Already up to date![/green]")
+        return
+
+    # Backup .claude directory
+    from datetime import datetime
+    backup_name = f".claude.backup.{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    if claude_dir.exists():
+        backup_path = cwd / backup_name
+        console.print(f"[dim]Creating backup: {backup_name}[/dim]\n")
+        shutil.copytree(claude_dir, backup_path)
+
+    # Perform upgrade
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+
+        # Remove old .claude directory
+        task1 = progress.add_task("Removing old templates...", total=1)
+        if claude_dir.exists():
+            shutil.rmtree(claude_dir)
+        progress.update(task1, completed=1)
+
+        # Copy new .claude directory
+        task2 = progress.add_task("Installing new templates...", total=1)
+        src_claude = TEMPLATES_DIR / ".claude"
+        if src_claude.exists():
+            shutil.copytree(src_claude, claude_dir)
+        progress.update(task2, completed=1)
+
+        # Update .mcp.json
+        task3 = progress.add_task("Updating MCP config...", total=1)
+        src_mcp = TEMPLATES_DIR / ".mcp.json"
+        dst_mcp = cwd / ".mcp.json"
+        if src_mcp.exists():
+            shutil.copy2(src_mcp, dst_mcp)
+        progress.update(task3, completed=1)
+
+        # Update CLAUDE.md (backup old one)
+        task4 = progress.add_task("Updating CLAUDE.md...", total=1)
+        src_claude_md = TEMPLATES_DIR / "CLAUDE.md"
+        dst_claude_md = cwd / "CLAUDE.md"
+        if dst_claude_md.exists():
+            old_claude_md = cwd / "CLAUDE.md.old"
+            shutil.copy2(dst_claude_md, old_claude_md)
+        if src_claude_md.exists():
+            shutil.copy2(src_claude_md, dst_claude_md)
+        progress.update(task4, completed=1)
+
+        # Update version in config
+        task5 = progress.add_task("Updating config version...", total=1)
+        if config_path.exists():
+            import json
+            try:
+                config = json.loads(config_path.read_text())
+                config["version"] = __version__
+                config_path.write_text(json.dumps(config, indent=2, ensure_ascii=False))
+            except json.JSONDecodeError:
+                pass
+        progress.update(task5, completed=1)
+
+    # Success message
+    console.print(f"\n[bold green]✓ Upgraded to v{__version__}![/bold green]\n")
+    console.print(f"[dim]Backup: {backup_name}[/dim]")
+
+    if (cwd / "CLAUDE.md.old").exists():
+        console.print("[dim]Previous CLAUDE.md saved as CLAUDE.md.old[/dim]")
+
+    console.print("\n[bold]Next steps:[/bold]")
+    console.print("  1. Review changes in .claude/")
+    console.print("  2. Check CLAUDE.md.old for any custom content to merge")
+    console.print("  3. Run: claude")
+
+
 if __name__ == "__main__":
     cli()
