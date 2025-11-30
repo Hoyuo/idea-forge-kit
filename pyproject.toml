@@ -49,7 +49,6 @@ dev = [
 
 [project.scripts]
 forge = "ideaforge.cli.main:cli"
-ideaforge = "ideaforge.cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/yourusername/idea-forge-kit"
