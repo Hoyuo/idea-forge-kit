@@ -167,6 +167,27 @@ PRD 분석 후 필요에 따라 자동 생성:
 - **Context7**: 최신 라이브러리 문서 참조
 - **Sequential-Thinking**: 복잡한 분석 및 설계
 
+## 예제
+
+### 실시간 채팅 앱
+
+`examples/chat-app/` - IdeaForge 워크플로우로 생성된 실시간 채팅 애플리케이션
+
+```bash
+cd examples/chat-app
+uv venv && source .venv/bin/activate
+uv pip install -e .
+pytest  # 테스트 실행
+```
+
+**생성 과정:**
+```
+/forge:idea "실시간 채팅 기능"     → CHAT-001.md 생성
+/forge:analyze CHAT-001           → 에이전트 3개 자동 생성
+/forge:build CHAT-001             → TDD로 구현
+/forge:verify CHAT-001            → 검증 완료
+```
+
 ## 라이선스
 
 [MIT](LICENSE)
